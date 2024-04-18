@@ -4,6 +4,7 @@
 /* TODO: Short description + typesetting in some compact way? */
 
 #let primary-color = state("primary-color", rgb("#005050"))
+#let register-size = state("register-size", 32)
 
 #let _number-cells(low, high, top: true) = {
   let color = luma(240)
@@ -20,13 +21,11 @@
   )[#x])
 }
 
-#let _field-cells(fields, register, show-descriptions) = {
+#let _field-cells(fields, register, show-descriptions, size-bytes) = {
   let reserved = none
   let result = ()
 
-  /* TODO: Allow arbitrary register sizes? */
-
-  for byte in range(0, 4) {
+  for byte in range(0, size-bytes) {
     let bit = 8 * byte
     let high = 8 * (byte + 1) - 1
 
@@ -144,20 +143,29 @@
   if description != none { block[#description] }
 
   /* Add a two-dimensional view of the register. */
+  let size-bits = register-size.get()
+  let size-bytes = int(size-bits / 8)
+  if size-bits != size-bytes * 8 {
+    panic("The register size (" + str(size-bits) + ") must be divisible by 8.")
+  }
+
+  let top-row = _number-cells(size-bits - 8, size-bits - 1, top: true)
+  let bottom-row = if size-bits > 8 { _number-cells(0, 7, top: false) } else { none }
+
   block(breakable: false)[
     #grid(
       columns: (100% / 8,) * 8,
       align: center + bottom,
       inset: 0.5em,
-      .._number-cells(24, 31, top: true),
-      .._field-cells(fields.pos(), name, show-descriptions),
-      .._number-cells(0, 7, top: false),
+      ..top-row,
+      .._field-cells(fields.pos(), name, show-descriptions, size-bytes),
+      ..bottom-row,
     )
   ]
 
   /* Add the field descriptions. */
   if show-descriptions and fields.pos().len() > 0 {
-    let last_lsb = 32
+    let last_lsb = size-bits
     let seen = ()
     for field in fields.pos().sorted(key: x => { x.pos }).rev() {
       let field-name = name + "::" + field.name
@@ -168,7 +176,7 @@
       if field.name in seen {
         panic("Field " + field-name + " already exists in the register.")
       }
-      if msb >= 32 or lsb < 0 {
+      if msb >= size-bits or lsb < 0 {
         panic("Field " + field-name + " exceeds the bounds of the register.")
       }
       if msb >= last_lsb {
