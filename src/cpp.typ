@@ -55,6 +55,21 @@
   let is-enum = type == "enum"
   let is-define = type == "define"
 
+  /* Not having these as positional arguments leads to more readable
+     invocations. Ideally, the LSP could be leveraged for that but lookup of
+     custom functions seems a bit shaky? */
+
+  if name == none { panic("A 'name' must be specified.") }
+  if type == none { panic("A 'type' must be specified.") }
+
+  let seen = ()
+  for subobject in subobjects.pos() {
+    if subobject.name in seen {
+      panic(name + "::" + subobject.name + " is already defined.")
+    }
+    seen.push(subobject.name)
+  }
+
   /* We change the typesetting of subobjects depending on the object type. */
   let rows = subobjects.pos().enumerate().map(((i, x)) => {
     let prefix = if show-descriptions { name + "::" } else { none }
@@ -184,6 +199,8 @@
   note: none,
   body,
 ) = {
+  if name == none { panic("A parameter 'name' must be specified.") }
+  if type == none { panic("A parameter 'type' must be specified.") }
   (name: name, type: type, dimension: dimension, note: note, body: body)
 }
 
@@ -221,6 +238,8 @@
   note: none,
   body,
 ) = {
+  if name == none { panic("A member 'name' must be specified.") }
+  if type == none { panic("A member 'type' must be specified.") }
   (name: name, type: type, dimension: dimension, note: note, body: body)
 }
 
@@ -257,6 +276,7 @@
   note: none,
   body,
 ) = {
+  if name == none { panic("A value 'name' must be specified.") }
   (name: name, type: value, dimension: none, note: note, body: body)
 }
 
