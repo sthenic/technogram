@@ -90,9 +90,19 @@
   ..fields,
   description,
 ) = context {
-  let inset = 0.5em
 
-  /* TODO: Validate fields? No overlap etc. */
+  /* Not having these as positional arguments leads to more readable
+     invocations. Ideally, the LSP could be leveraged for that but lookup of
+     custom functions seems a bit shaky? */
+
+  if name == none { panic("A 'name' must be specified.") }
+  if offset == none { panic("An 'offset' must be specified.") }
+  if default == none { panic("A 'default' value must be specified.") }
+  for field in fields.pos() {
+    if field.name == none { panic("A field 'name' must be specified.") }
+    if field.pos == none { panic("A field 'pos' (position) must be specified.") }
+    if field.size == none { panic("A field 'size' must be specified.") }
+  }
 
   /* Add entry so we can retrieve the object for the outline. */
   _grouped-outline.grouped-outline-entry(raw(name), group, "reg")
@@ -138,7 +148,7 @@
     #grid(
       columns: (100% / 8,) * 8,
       align: center + bottom,
-      inset: inset,
+      inset: 0.5em,
       .._number-cells(24, 31, top: true),
       .._field-cells(fields.pos(), name, show-descriptions),
       .._number-cells(0, 7, top: false),
@@ -147,13 +157,27 @@
 
   /* Add the field descriptions. */
   if show-descriptions and fields.pos().len() > 0 {
+    let last_lsb = 32
+    let seen = ()
     for field in fields.pos().sorted(key: x => { x.pos }).rev() {
+      let field-name = name + "::" + field.name
+      let msb = field.pos + field.size - 1
+      let lsb = field.pos
+
+      /* The field must be unique, reside within the register and not overlap with another field. */
+      if field.name in seen {
+        panic("Field " + field-name + " already exists in the register.")
+      }
+      if msb >= 32 or lsb < 0 {
+        panic("Field " + field-name + " exceeds the bounds of the register.")
+      }
+      if msb >= last_lsb {
+        panic("Field " + field-name + " overlaps with another field in the register.")
+      }
+
       let field-label = [
-        *Bit #if field.size > 1 [
-          #str(field.pos + field.size - 1):#str(field.pos)
-        ] else {
-          str(field.pos)
-        }* --- #raw(field.name)]
+        *Bit #if field.size > 1 [ #str(msb):#str(lsb) ] else { str(lsb) }* --- #raw(field.name)
+      ]
 
       if field.short-description != none {
         field-label += [ --- #field.short-description]
@@ -161,10 +185,13 @@
 
       describe([
           #field-label
-          #label(name + "::" + field.name)
+          #label(field-name)
         ],
         note: field.access
       )[#field.body]
+
+      last_lsb = lsb
+      seen.push(field.name)
     }
   }
 }
