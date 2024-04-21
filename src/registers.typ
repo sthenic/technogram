@@ -1,9 +1,10 @@
 #import "descriptions.typ": *
 #import "grouped-outline.typ" as _grouped-outline
+#import "palette.typ": palette
 
 /* TODO: Short description + typesetting in some compact way? */
 
-#let primary-color = state("primary-color", rgb("#005050"))
+/* States */
 #let register-size = state("register-size", 32)
 
 #let _number-cells(low, high, top: true) = {
@@ -125,7 +126,7 @@
 
   block[
     #set block(spacing: 8pt)
-    #line(length: 100%, stroke: 1pt + primary-color.get())
+    #line(length: 100%, stroke: 1pt + palette.get().primary)
     #grid(
       columns: (auto, 1fr),
       align: bottom,
