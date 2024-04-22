@@ -34,9 +34,19 @@
   },
 )
 
+/* A state that holds the page number where the `backmatter` starts at.
+   We use this to exclude backmatter pages from the total page count. */
+#let _page-before-backmatter = state("page-before-backmatter", none)
+
 /* Footer constructor (contextual) */
 #let _footer(metadata) = context {
   set text(size: 9pt)
+  let final-page = if _page-before-backmatter.get() != none {
+    _page-before-backmatter.get()
+  } else {
+    counter(page).final().at(0)
+  }
+
   grid(
     columns: (1fr, 1fr, 1fr),
     align: (left, center, right),
@@ -46,10 +56,7 @@
     ],
     metadata.document-name,
     link(metadata.url.url)[#metadata.url.label],
-    [Page #counter(page).display(
-      "1 of 1",
-      both: true,
-    )]
+    [Page #counter(page).display("1") of #final-page]
   )
 }
 
@@ -267,5 +274,12 @@
 
   /* FIXME: Probably need referenceable enumeration items with https://gist.github.com/PgBiel/23a116de4a235ad4cf6c7a05d6648ca9 */
 
+  body
+}
+
+/* Insert unnumbered pages w/o header and footer at the end of the document. */
+#let backmatter(body) = {
+  context _page-before-backmatter.update(counter(page).get().at(0))
+  set page(footer: none, header: none, numbering: none)
   body
 }
