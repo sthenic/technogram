@@ -73,7 +73,7 @@
   bottom: 1.2pt,
 )
 
-#let _titlepage(metadata, logotype, color) = {
+#let _title-page(metadata, logotype, color) = {
   /* Suppress the footer and remove the header metadata. */
   set page(
     header: _header(none, logotype),
@@ -168,7 +168,7 @@
   date: datetime.today().display(),
   url: none,
   logotype: none,
-  show-titlepage: true,
+  show-title-page: true,
   show-outline: true,
   font: "Arial",
   monofont: "Latin Modern Mono",
@@ -247,9 +247,10 @@
   show raw.line: it => { _raw-links.format-raw-line(it) }
   set raw(theme: "raw.tmTheme")
 
-  /* Conditionally insert the titlepage. */
-  if show-titlepage {
-    _titlepage(metadata, logotype, color)
+  /* Conditionally insert the title page. */
+  if show-title-page {
+    _title-page(metadata, logotype, color)
+    counter(page).update(1)
   }
 
   /* Conditionally insert the outline and a pagebreak. */
@@ -259,7 +260,7 @@
   }
 
   /* Update the colors scheme of a few select admonitions. */
-  /* TODO: For some reason we can't do this before the titlepage or the layout breaks. */
+  /* TODO: For some reason we can't do this before the title page or the layout breaks. */
   let admonition-color = (header: color.primary, content: color.secondary)
   note-color.update(admonition-color)
   tip-color.update(admonition-color)
