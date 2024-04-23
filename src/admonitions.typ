@@ -18,9 +18,9 @@
          the admonition box to be breakable. See comment in "descriptions.typ". */
       block(breakable: false)[
         /* A grid within a rect is better than colored grid boxes (renders edges between the cells). */
-        #rect(fill: colors.header, inset: 5pt, width: 100%)[
+        #rect(fill: colors.header, inset: 0.5em, width: 100%)[
           #grid(
-            columns: (if symbol != none { 1em + 5pt } else { 0pt }, 1fr),
+            columns: (if symbol != none { 1.5em } else { 0pt }, 1fr),
             align: bottom + left,
             if symbol != none {
               text(fill: _get-text-color(colors.header), font: "Font Awesome 6 Free Solid", symbol)
@@ -35,7 +35,7 @@
     #grid(
       columns: (gutter, 100% - gutter),
       grid.cell(fill: colors.header)[],
-      grid.cell(fill: colors.content, inset: 5pt)[#text(fill: _get-text-color(colors.content), body)]
+      grid.cell(fill: colors.content, inset: 0.5em)[#text(fill: _get-text-color(colors.content), body)]
     )
   ]
 }
