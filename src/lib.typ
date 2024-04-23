@@ -41,8 +41,8 @@
 /* Footer constructor (contextual) */
 #let _footer(metadata) = context {
   set text(size: 9pt)
-  let final-page = if _page-before-backmatter.get() != none {
-    _page-before-backmatter.get()
+  let final-page = if _page-before-backmatter.final() != none {
+    _page-before-backmatter.final()
   } else {
     counter(page).final().at(0)
   }
@@ -278,8 +278,8 @@
 }
 
 /* Insert unnumbered pages w/o header and footer at the end of the document. */
-#let backmatter(body) = {
+#let backmatter(logotype: none, footer: none, body) = {
   context _page-before-backmatter.update(counter(page).get().at(0))
-  set page(footer: none, header: none, numbering: none)
+  set page(footer: footer, header: _header(none, logotype), numbering: none)
   body
 }
