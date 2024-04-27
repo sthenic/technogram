@@ -218,7 +218,7 @@
 
   /* Sections */
   set heading(numbering: "1.1  ")
-  show heading: set block(above: 1.4em, below: 1em)
+  show heading: set block(above: 2.4em, below: 1.4em)
 
   /* Equations */
   set math.equation(numbering: "(1)")
