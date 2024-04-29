@@ -2,32 +2,46 @@
 #import "palette.typ": palette
 
 /* TODO: Avoid inheriting indentation w/ https://stackoverflow.com/a/78185552 */
-#let admonition(header-color, body-color, header: none, symbol: none, gutter: 0pt, breakable: false, body) = {
-  block(breakable: breakable)[
-    #set block(spacing: 0pt)
-    #if header != none {
-      /* We resort to a hacky solution to keep the header with the contents while still allowing
-         the admonition box to be breakable. See comment in "descriptions.typ". */
-      block(breakable: false)[
-        /* A grid within a rect is better than colored grid boxes (renders edges between the cells). */
-        #rect(fill: header-color, inset: 0.5em, width: 100%)[
+#let admonition(
+  header-color,
+  body-color,
+  header: none,
+  symbol: none,
+  gutter: 0pt,
+  breakable: false,
+  body
+) = {
+  let inset = 0.5em
+  let cells = (
+    if header != none {
+      grid.cell(fill: header-color, colspan: 2, inset: inset)[
+        /* We resort to a hacky solution to keep the header with the contents
+           while still allowing the admonition box to be breakable. See comment
+           in "descriptions.typ". */
+        #block(breakable: false)[
+          #set text(fill: get-text-color(header-color))
           #grid(
             columns: (if symbol != none { 1.5em } else { 0pt }, 1fr),
             align: bottom + left,
-            if symbol != none {
-              text(fill: get-text-color(header-color), font: "Font Awesome 6 Free Solid", symbol)
-            },
-            text(fill: get-text-color(header-color), weight: "bold", header),
+            if symbol != none { text(font: "Font Awesome 6 Free Solid", symbol) },
+            strong(header)
           )
+          #v(3em)
         ]
-        #v(3em)
+        #v(-3em)
       ]
-      v(-3em)
-    }
+    },
+    grid.cell(fill: header-color)[],
+    grid.cell(fill: body-color, inset: inset)[
+      #set text(fill: get-text-color(body-color))
+      #body
+    ],
+  ).filter(x => x != none)
+
+  block(breakable: breakable)[
     #grid(
       columns: (gutter, 100% - gutter),
-      grid.cell(fill: header-color)[],
-      grid.cell(fill: body-color, inset: 0.5em)[#text(fill: get-text-color(body-color), body)]
+      ..cells
     )
   ]
 }
