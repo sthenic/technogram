@@ -44,6 +44,8 @@
       ..cells
     )
   ]
+
+  /* TODO: Wishlist: add some vertical space if a list is the last thing in the box. */
 }
 
 /* A note */

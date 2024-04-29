@@ -236,6 +236,23 @@
   set list(indent: 1.5em, body-indent: 1em)
   set enum(indent: 1.5em, body-indent: 1em, number-align: start + top)
 
+  /* We only want the first level of a list to be indented so we have a global
+     show rule to make it so the objects are created with a nonzero indentation.
+     Then, once the show rules below are invoked, we change the indentation to
+     zero. This works (I think) because nested lists specified with the markdown
+     syntax do not create list objects until they are encountered when walking
+     through the top level items. */
+
+  show list: it => {
+    set list(indent: 0pt)
+    it
+  }
+
+  show enum: it => {
+    set enum(indent: 0pt)
+    it
+  }
+
   /* Hook to pass raw content through the function library. */
   show raw: it => { _raw-links.format-raw(it) }
   show raw.line: it => { _raw-links.format-raw-line(it) }
