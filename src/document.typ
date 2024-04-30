@@ -161,7 +161,7 @@
   logotype: none,
   show-title-page: true,
   show-outline: true,
-  font: "Arial",
+  font: "Linux Libertine",
   monofont: "Latin Modern Mono",
   fontsize: 10pt,
   palette-overrides: none,

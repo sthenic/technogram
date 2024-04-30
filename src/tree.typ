@@ -5,7 +5,7 @@
 #let tree(body) = context {
   let line-height = measure("M").height
   let indent = 0pt /* TODO: Dynamically set this somehow? */
-  let row-gutter = par.leading
+  let row-gutter = par.leading * 150%
   let column-gutter = tree-depth.get() * 30%
   let stroke = tree-stroke.get()
 
@@ -99,4 +99,17 @@
     _tree(it, i == 0, false)
   }
   _tree(last, filtered.len() == 0, true)
+}
+
+/* Convenience function for a grid with cells equal in size that number as many
+   as there are positional arguments. All of these grid properties can be
+   overridden by supplying named arguments. The idea is to provide "sane
+   defaults" to a grid object that may be used as a tree item, e.g. to create an
+   annotation to the right of the leaf text. */
+#let tree-span(..any) = {
+  grid(
+    columns: (1fr,) * any.pos().len(),
+    gutter: 1em,
+    ..any
+  )
 }
