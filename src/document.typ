@@ -154,7 +154,7 @@
   document-name: none,
   author: none,
   classification: "Public",
-  revision: none,
+  revision: sys.inputs.at("revision", default: none),
   document-id: none,
   date: datetime.today().display(),
   url: none,
@@ -170,12 +170,6 @@
 
   /* Merge the default palette with any user override. */
   palette-overrides = DEFAULT-PALETTE + palette-overrides
-
-  /* Attempt to read the revision from the command line parameters. */
-  if revision == none {
-    revision = sys.inputs.at("revision", default: none)
-    /* TODO: Error if still none? */
-  }
 
   /* Construct the document name. */
   if document-name == none and title != none {
