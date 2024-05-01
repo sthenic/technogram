@@ -279,3 +279,34 @@
   set page(footer: footer, header: _header(none, logotype), numbering: none)
   body
 }
+
+/* FIXME: Call it "document history" instead? */
+#let changelog(..any) = context {
+  pagebreak(weak: true)
+  heading(level: 1, numbering: none, outlined: false, bookmarked: false)[Changelog]
+  table(
+    columns: (0.2fr, 0.8fr),
+    fill: none,
+    inset: (top: 0.65em, bottom: 0.65em),
+    table.header[Location][Description],
+    ..any.pos().flatten(),
+  )
+  pagebreak()
+}
+
+#let changelog-section(hide: false, label, date, ..any) = (
+  /* Add a section header row. */
+  table.cell(colspan: 2, stroke: (top: 0.7pt, bottom: 0.7pt))[
+    #strong("Revision " + label)
+    #h(1fr)
+    #date
+  ],
+  /* Interpret the positional arguments as table cells which we apply an
+      alternating fill color to in pairs of two (since we have two columns).
+      If `hide` is set to true, we skip these cells. */
+  ..if not hide {
+    any.pos().enumerate().map(((i, x)) => {
+      table.cell(fill: if calc.odd(int(i / 2)) { luma(240) } )[#x]
+    })
+  }
+)
