@@ -49,71 +49,64 @@
 }
 
 /* A note */
-#let note(..args, body) = context admonition(
+#let note(..args) = context admonition(
   palette.get().note-header,
   palette.get().note-body,
   header: "Note",
   symbol: "\u{f06a}",
-  ..args,
-  body
+  ..args
 )
 
 /* A tip */
-#let tip(..args, body) = context admonition(
+#let tip(..args) = context admonition(
   palette.get().tip-header,
   palette.get().tip-body,
   header: "Tip",
   symbol: "\u{f06a}",
-  ..args,
-  body
+  ..args
 )
 
 /* A callout to something important */
-#let important(..args, body) = context admonition(
+#let important(..args) = context admonition(
   palette.get().important-header,
   palette.get().important-body,
   header: "Important",
   symbol: "\u{f06a}",
-  ..args,
-  body
+  ..args
 )
 
 /* A warning */
-#let warning(..args, body) = context admonition(
+#let warning(..args) = context admonition(
   palette.get().warning-header,
   palette.get().warning-body,
   header: "Warning",
   symbol: "\u{f071}",
-  ..args,
-  body
+  ..args
 )
 
 /* An example */
-#let example(..args, body) = context admonition(
+#let example(..args) = context admonition(
   palette.get().example-header,
   palette.get().example-body,
   header: "Example",
   symbol: "\u{f02d}",
-  ..args,
-  body
+  ..args
 )
 
 /* A release */
-#let release(label, ..args, body) = context admonition(
+#let release(label, ..args) = context admonition(
   palette.get().release-header,
   palette.get().release-body,
   header: "Release " + label,
   symbol: "\u{f135}",
-  ..args,
-  body
+  ..args
 )
 
 /* A display box (without header) */
-#let display(..args, body) = context admonition(
+#let display(..args) = context admonition(
   palette.get().display-header,
   palette.get().display-body,
   header: none,
   gutter: 2pt,
-  ..args,
-  body
+  ..args
 )
