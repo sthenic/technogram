@@ -108,6 +108,31 @@
   )
 }
 
+#let _title-line(metadata, palette) = {
+  grid(
+    columns: (1fr, 1fr),
+    align: (left, right),
+    /* Title on a line of its own. */
+    grid.cell(colspan: 2)[
+      #text(size: 22pt, weight: "bold", fill: palette.primary)[#metadata.title]
+    ],
+    /* A horizontal rule to separate. */
+    grid.cell(colspan: 2, inset: (top: 12pt, bottom: 6pt))[
+      #line(stroke: 0.4pt, length: 100%)
+    ],
+    /* The subtitle followed by the authors. */
+    text(size: 14pt, weight: "bold", fill: palette.primary)[#metadata.subtitle],
+    text(size: 12pt)[
+      #if type(metadata.author) == array {
+        metadata.author.join(", ", last: " and ")
+      } else {
+        metadata.author
+      }
+    ],
+  )
+  v(2em, weak: true)
+}
+
 /* Outline with custom styling applied in a scope so as not to affect other outlines. */
 #let _outline() = {
   // TODO: The spacing between the heading number and the label is rather small but fine
@@ -255,6 +280,8 @@
   if show-title-page {
     _title-page(metadata, logotype, palette-overrides)
     counter(page).update(1)
+  } else {
+    _title-line(metadata, palette-overrides)
   }
 
   /* Conditionally insert the outline and a pagebreak. */
