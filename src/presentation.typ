@@ -151,8 +151,8 @@
   )
 
   /* Paragraphs */
-  set par(leading: 0.7em, first-line-indent: 15pt, justify: false)
-  show par: set block(spacing: 0.7em)
+  set par(leading: 0.8em, first-line-indent: 15pt, justify: false)
+  show par: set block(spacing: 0.8em)
 
   /* Fonts */
   set text(font: font, size: fontsize)
