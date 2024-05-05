@@ -234,6 +234,7 @@
   /* Fonts */
   set text(font: font, size: fontsize)
   show raw: set text(font: monofont, size: fontsize)
+  set super(typographic: false, baseline: -0.6em)
 
   /* Sections */
   set heading(numbering: "1.1  ")
