@@ -236,6 +236,24 @@
   show raw: set text(font: monofont, size: fontsize)
   set super(typographic: false, baseline: -0.6em)
 
+  /* Footnote entries (we add some spacing after the counter and a grid to align
+     multiline footnotes). */
+  show footnote.entry: it => {
+    grid(
+      columns: (it.indent, auto, 0.3em, 1fr),
+      none,
+      {
+        /* For some reason we need content (made invisible) for `super` to anchor correctly. */
+        box(width: 0pt)[#hide[M]]
+        super[#counter(footnote).at(it.note.location()).first()]
+      },
+      none,
+      it.note.body
+    )
+  }
+
+  set footnote.entry(indent: 1em, gap: 0.8em)
+
   /* Sections */
   set heading(numbering: "1.1  ")
   show heading: set block(above: 2.4em, below: 1.4em)
