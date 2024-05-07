@@ -124,7 +124,9 @@
     none
   }
 
-  block[
+  /* This information is expected to be compact with mostly one output line per
+     grid row. We use an unbreakable block to keep things together. */
+  block(breakable: false)[
     #set block(spacing: 8pt)
     #line(length: 100%, stroke: 1pt + palette.get().primary)
     #grid(
