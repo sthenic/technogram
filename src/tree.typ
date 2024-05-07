@@ -2,7 +2,7 @@
 #let tree-depth = state("tree-depth", 20pt)
 
 /* Insert a tree. The nodes are ideally defined using the "tight" list syntax. */
-#let tree(body) = context {
+#let tree(breakable: true, body) = context {
   let line-height = measure("M").height
   let indent = 0pt /* TODO: Dynamically set this somehow? */
   let row-gutter = par.leading * 150%
@@ -89,16 +89,20 @@
     filtered.remove(0)
   }]
 
-  set block(spacing: 0pt)
-  block[#content-on-this-level]
+  /* We wrap everything in a block to allow the user to choose whether the tree
+     is breakable or not.  */
+  block(breakable: breakable, {
+    set block(spacing: 0pt)
+    block[#content-on-this-level]
 
-  let filtered = filtered.filter(x => x != [ ])
-  let last = filtered.pop()
+    let filtered = filtered.filter(x => x != [ ])
+    let last = filtered.pop()
 
-  for (i, it) in filtered.enumerate() {
-    _tree(it, i == 0, false)
-  }
-  _tree(last, filtered.len() == 0, true)
+    for (i, it) in filtered.enumerate() {
+      _tree(it, i == 0, false)
+    }
+    _tree(last, filtered.len() == 0, true)
+  })
 }
 
 /* Convenience function for a grid with cells equal in size that number as many
