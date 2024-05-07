@@ -81,9 +81,9 @@
             align: (left, right),
             label, page
           )
-          #v(3em)
+          #v(2em)
         ]
-        v(-3em)
+        v(-2em)
       }
     }
 
