@@ -1,4 +1,5 @@
 /* Convenience functions to generate grouped outlines.  */
+#import "keep-with-next.typ": *
 
 /* We use a figure (taking up no space on the page) to place an outlineable item
    so that we can construct a custom outline later on. We set the kind based on
@@ -64,7 +65,7 @@
 
   for group in outline-groups {
     if outline-groups.len() > 0 {
-      /* Don't place a headline for the default group or if disabled altogether. */
+      /* Don't place a heading for the default group or if disabled altogether. */
       if show-title and group != default-group {
         /* Attempt to locate the page of any label with the same name as the group.
            We have to gate behind a `query` because `locate` must be successful. */
@@ -75,15 +76,14 @@
           (strong(group), none)
         }
 
-        block(breakable: false)[
+        /* We keep the heading together with the first entry. */
+        keep-with-next(threshold: 2em)[
           #grid(
             columns: (auto, 1fr),
             align: (left, right),
             label, page
           )
-          #v(2em)
         ]
-        v(-2em)
       }
     }
 
