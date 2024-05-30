@@ -266,7 +266,8 @@
 
   /* Tables */
   show table.cell.where(y: 0): strong
-  set table(fill: _table-fill, stroke: _table-stroke, align: left)
+  set table(fill: _table-fill, stroke: _table-stroke, align: left,
+            inset: (top: 0.65em, bottom: 0.65em))
   show figure.where(kind: table): set figure.caption(position: top)
   show figure.where(kind: table): set block(inset: (left: 5%, right: 5%))
 
@@ -351,7 +352,6 @@
   table(
     columns: (0.2fr, 0.8fr),
     fill: none,
-    inset: (top: 0.65em, bottom: 0.65em),
     table.header[Location][Description],
     ..any.pos().flatten(),
   )
@@ -366,8 +366,8 @@
     #date
   ],
   /* Interpret the positional arguments as table cells which we apply an
-      alternating fill color to in pairs of two (since we have two columns).
-      If `hide` is set to true, we skip these cells. */
+     alternating fill color to in pairs of two (since we have two columns).
+     If `hide` is set to true, we skip these cells. */
   ..if not hide {
     any.pos().enumerate().map(((i, x)) => {
       table.cell(fill: if calc.odd(int(i / 2)) { luma(240) } )[#x]
