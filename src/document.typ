@@ -272,7 +272,25 @@
 
   /* Lists */
   set list(indent: 1.5em, body-indent: 1em)
-  set enum(indent: 1.5em, body-indent: 1em, number-align: start + top)
+  set enum(
+    indent: 1.5em,
+    body-indent: 1em,
+    number-align: start + top,
+    full: true,
+    numbering: (..n) => {
+      let remainder = calc.rem(n.pos().len(), 4)
+      let format = if remainder == 1 {
+        "1."
+      } else if remainder == 2 {
+        "(a)"
+      } else if remainder == 3 {
+        "i."
+      } else if remainder == 0 {
+        "A."
+      }
+      numbering(format, n.pos().last())
+    }
+  )
 
   /* We only want the first level of a list to be indented so we have a global
      show rule to make it so the objects are created with a nonzero indentation.
