@@ -264,12 +264,27 @@
   /* Links (we don't color references) */
   show link: set text(fill: palette-overrides.primary)
 
-  /* Tables */
+  /* Tables and figures */
   show table.cell.where(y: 0): strong
   set table(fill: _table-fill, stroke: _table-stroke, align: left,
             inset: (top: 0.65em, bottom: 0.65em))
   show figure.where(kind: table): set figure.caption(position: top)
   show figure.where(kind: table): set block(inset: (left: 5%, right: 5%))
+  show figure: set block(above: 3em , below: 3em, breakable: false)
+  set figure(gap: 1.5em)
+
+  /* Custom caption formatting to get the alignment right. */
+  show figure.caption: it => {
+    let label = [
+      #it.supplement #context numbering(it.numbering, it.counter.get().first())#it.separator
+    ]
+    grid(
+      columns: (auto, auto),
+      align: left,
+      column-gutter: 0.4em,
+      label, it.body,
+    )
+  }
 
   /* Lists */
   set list(indent: 1.5em, body-indent: 1em)
