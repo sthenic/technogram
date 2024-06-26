@@ -181,7 +181,7 @@
   classification: "Public",
   revision: sys.inputs.at("revision", default: none),
   document-id: none,
-  date: datetime.today().display(),
+  date: sys.inputs.at("date", default: datetime.today().display()),
   url: none,
   logotype: none,
   show-title-page: true,
