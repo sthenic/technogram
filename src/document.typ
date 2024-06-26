@@ -1,4 +1,4 @@
-#import "palette.typ": DEFAULT-PALETTE, palette, generate-admonition-palette
+#import "palette.typ": DEFAULT-PALETTE, update-palette, generate-admonition-palette
 #import "metadata.typ": get-metadata, update-metadata
 #import "raw-links.typ" as _raw-links
 
@@ -194,7 +194,7 @@
   body,
 ) = {
 
-  /* Merge the default palette with any user override. */
+  /* Merge the default palette with any user overrides. */
   palette-overrides = DEFAULT-PALETTE + palette-overrides
 
   /* Construct the document name. */
@@ -346,7 +346,7 @@
 
   /* Update the global palette and generate a matching one for admonition boxes. */
   set raw(theme: "raw.tmTheme")
-  palette.update(palette-overrides)
+  update-palette(..palette-overrides)
   generate-admonition-palette(palette-overrides.primary, palette-overrides.secondary)
 
   /* Update the global document metadata for arbitrary access to the values

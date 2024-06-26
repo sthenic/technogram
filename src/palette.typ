@@ -34,6 +34,9 @@
   palette.update(palette.get() + args.named())
 }
 
+/* Convenience function to avoid exporting the state variable directly. */
+#let get-palette() = palette.get()
+
 /* Convenience function to generate a somewhat unified palette for the admonitions. */
 #let generate-admonition-palette(primary, secondary) = {
   /* TODO: Explicit for now, warning keeps its color. */

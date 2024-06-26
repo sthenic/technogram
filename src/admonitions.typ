@@ -1,5 +1,5 @@
 #import "common.typ": get-text-color
-#import "palette.typ": palette
+#import "palette.typ": get-palette
 
 /* TODO: Avoid inheriting indentation w/ https://stackoverflow.com/a/78185552 */
 #let admonition(
@@ -50,8 +50,8 @@
 
 /* A note */
 #let note(..args) = context admonition(
-  palette.get().note-header,
-  palette.get().note-body,
+  get-palette().note-header,
+  get-palette().note-body,
   header: "Note",
   symbol: "\u{f06a}",
   ..args
@@ -59,8 +59,8 @@
 
 /* A tip */
 #let tip(..args) = context admonition(
-  palette.get().tip-header,
-  palette.get().tip-body,
+  get-palette().tip-header,
+  get-palette().tip-body,
   header: "Tip",
   symbol: "\u{f06a}",
   ..args
@@ -68,8 +68,8 @@
 
 /* A callout to something important */
 #let important(..args) = context admonition(
-  palette.get().important-header,
-  palette.get().important-body,
+  get-palette().important-header,
+  get-palette().important-body,
   header: "Important",
   symbol: "\u{f06a}",
   ..args
@@ -77,8 +77,8 @@
 
 /* A warning */
 #let warning(..args) = context admonition(
-  palette.get().warning-header,
-  palette.get().warning-body,
+  get-palette().warning-header,
+  get-palette().warning-body,
   header: "Warning",
   symbol: "\u{f071}",
   ..args
@@ -86,8 +86,8 @@
 
 /* An example */
 #let example(..args) = context admonition(
-  palette.get().example-header,
-  palette.get().example-body,
+  get-palette().example-header,
+  get-palette().example-body,
   header: "Example",
   symbol: "\u{f02d}",
   ..args
@@ -95,8 +95,8 @@
 
 /* A release */
 #let release(label, ..args) = context admonition(
-  palette.get().release-header,
-  palette.get().release-body,
+  get-palette().release-header,
+  get-palette().release-body,
   header: "Release " + label,
   symbol: "\u{f135}",
   ..args
@@ -104,8 +104,8 @@
 
 /* A display box (without header) */
 #let display(..args) = context admonition(
-  palette.get().display-header,
-  palette.get().display-body,
+  get-palette().display-header,
+  get-palette().display-body,
   header: none,
   gutter: 2pt,
   ..args

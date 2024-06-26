@@ -1,6 +1,6 @@
 #import "descriptions.typ": *
 #import "grouped-outline.typ" as _grouped-outline
-#import "palette.typ": palette
+#import "palette.typ": get-palette
 
 /* TODO: Short description + typesetting in some compact way? */
 
@@ -128,7 +128,7 @@
      grid row. We use an unbreakable block to keep things together. */
   block(breakable: false)[
     #set block(spacing: 8pt)
-    #line(length: 100%, stroke: 1pt + palette.get().primary)
+    #line(length: 100%, stroke: 1pt + get-palette().primary)
     #grid(
       columns: (auto, 1fr),
       align: bottom,

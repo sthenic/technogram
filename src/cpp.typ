@@ -1,6 +1,6 @@
 #import "descriptions.typ": *
 #import "grouped-outline.typ" as _grouped-outline
-#import "palette.typ": palette
+#import "palette.typ": get-palette
 
 /* Typeset the description of a subobject using the describe environment. */
 #let _subobject_description(subobject, label-prefix: "") = {
@@ -107,7 +107,7 @@
   let opening-text = if is-define { "#" } else { "" } + type + " " + name + opening-symbol
   block(breakable: breakable)[
     #set block(spacing: 8pt)
-    #line(length: 100%, stroke: 1pt + palette.get().primary)
+    #line(length: 100%, stroke: 1pt + get-palette().primary)
     #grid(
       columns: (20pt, 1fr, auto),
       align: left + bottom,
