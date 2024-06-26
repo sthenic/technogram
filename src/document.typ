@@ -1,4 +1,5 @@
 #import "palette.typ": DEFAULT-PALETTE, palette, generate-admonition-palette
+#import "metadata.typ": get-metadata, update-metadata
 #import "raw-links.typ" as _raw-links
 
 /* A state that holds the page number where the `backmatter` starts at.
@@ -186,7 +187,7 @@
   logotype: none,
   show-title-page: true,
   show-outline: true,
-  font: "Linux Libertine",
+  font: "Liberation Sans",
   monofont: "Latin Modern Mono",
   fontsize: 10pt,
   palette-overrides: none,
@@ -348,6 +349,12 @@
   palette.update(palette-overrides)
   generate-admonition-palette(palette-overrides.primary, palette-overrides.secondary)
 
+  /* Update the global document metadata for arbitrary access to the values
+     provided to the template. We spread the dictionary be because each named
+     argument gets inserted into the metadata (we don't interact with the state
+     variable directly). */
+  update-metadata(..metadata)
+
   /* FIXME: Probably need referenceable enumeration items with https://gist.github.com/PgBiel/23a116de4a235ad4cf6c7a05d6648ca9 */
 
   body
@@ -376,9 +383,17 @@
 #let changelog-section(hide: false, label, date, ..any) = (
   /* Add a section header row. */
   table.cell(colspan: 2, stroke: (top: 0.7pt, bottom: 0.7pt))[
-    #strong("Revision " + label)
+    #if label == auto {
+      strong("Revision " + context get-metadata().revision)
+    } else {
+      strong("Revision " + label)
+    }
     #h(1fr)
-    #date
+    #if date == auto {
+      context get-metadata().date
+    } else {
+      date
+    }
   ],
   /* Interpret the positional arguments as table cells which we apply an
      alternating fill color to in pairs of two (since we have two columns).

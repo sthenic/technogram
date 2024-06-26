@@ -26,10 +26,10 @@
   display-body: luma(240),
 )
 
-/* The global palette state that the user is able to modify. */
+/* The global palette state. */
 #let palette = state("palette", DEFAULT-PALETTE)
 
-/* Convenience function to override any number of entries in the state array.  */
+/* Convenience function to override any number of entries in the state. */
 #let update-palette(..args) = context {
   palette.update(palette.get() + args.named())
 }
