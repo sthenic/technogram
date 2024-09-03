@@ -1,6 +1,7 @@
 #import "palette.typ": DEFAULT-PALETTE, update-palette, generate-admonition-palette
 #import "metadata.typ": get-metadata, update-metadata
 #import "raw-links.typ" as _raw-links
+#import "requirements.typ" as _requirements
 
 /* A state that holds the page number where the `backmatter` starts at.
    We use this to exclude backmatter pages from the total page count. */
@@ -330,6 +331,9 @@
   show raw: it => { _raw-links.format-raw(it) }
   show raw.line: it => { _raw-links.format-raw-line(it) }
 
+  /* Hook to pass references through the requirements library. */
+  show ref: it => { _requirements.format-reference(it) }
+
   /* Conditionally insert the title page. */
   if show-title-page {
     _title-page(metadata, logotype, palette-overrides)
@@ -358,6 +362,9 @@
   /* FIXME: Probably need referenceable enumeration items with https://gist.github.com/PgBiel/23a116de4a235ad4cf6c7a05d6648ca9 */
 
   body
+
+  /* Check for duplicate requirements. */
+  _requirements.check-for-duplicates()
 }
 
 /* Insert unnumbered pages w/o header and footer at the end of the document. */

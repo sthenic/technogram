@@ -41,6 +41,7 @@
 
     content
   } else {
+    /* TODO: Still run insert-discretionary-breaks for raw text here? Could be nice. */
     default
   }
 }
