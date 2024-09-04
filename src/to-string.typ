@@ -1,7 +1,9 @@
 /* Naive implementation of turning _simple_ content into a string.
    Borrowed from https://github.com/typst/typst/issues/2196. */
 #let to-string(content) = {
-  if content.has("text") {
+  if content.func() == smartquote {
+    if content.double {"\""} else {"'"}
+  } else if content.has("text") {
     content.text
   } else if content.has("children") {
     content.children.map(to-string).join("")
