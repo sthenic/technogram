@@ -2,7 +2,7 @@
 
 /* Hook to replace references of kind 'requirement' with custom text. */
 #let format-reference(it) = {
-  if it.element != none and it.element.kind == "requirement" {
+  if it.element != none and it.element.has("kind") and it.element.kind == "requirement" {
     link(it.target, it.element.caption.body)
   } else {
     it
