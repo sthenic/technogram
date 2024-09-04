@@ -17,9 +17,9 @@
   let title-text = if _current-title.get() != none {
     _current-title.get()
   } else if after.len() > 0 {
-    after.first().body.text
+    after.first().body
   } else {
-    none
+    panic("The presentation needs at least one top-level heading.")
   }
 
   grid(
@@ -176,13 +176,17 @@
   show heading.where(level: 1): it => context {
     /* If the current title has yet to be set, we're dealing with the first one.
        Otherwise, we insert a pagebreak, but not before updating the title to
-       allow the header to reflect the new title. */
+       allow the header to reflect the new title. Additionally, if the title
+       changes we toggle the outline state so this heading location is
+       included in the outline. */
     if it.at("label", default: none) == <technogram-presentation-heading> {
       it
     } else {
       let insert-pagebreak = _current-title.get() != none
+      if _current-title.get() != none and _current-title.get() != it.body {
+        _outline-title.update(true)
+      }
       _current-title.update(it.body)
-      _outline-title.update(true)
       if insert-pagebreak {
         pagebreak()
       }
