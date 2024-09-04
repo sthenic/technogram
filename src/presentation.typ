@@ -140,10 +140,10 @@
     margin: (
       left: 2cm,
       right: 2cm,
-      top: 3cm,
+      top: 4cm,
       bottom: 2em,
     ),
-    header-ascent: 1cm,
+    header-ascent: 2cm,
     footer-descent: 0em,
     header: _header(logotype),
     footer: _footer(document-name, classification, palette-overrides),
