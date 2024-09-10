@@ -1,4 +1,4 @@
-#import "palette.typ": DEFAULT-PALETTE, update-palette, generate-admonition-palette
+#import "palette.typ": DEFAULT-PALETTE, update-palette, generate-admonition-palette, table-fill, table-stroke
 #import "common.typ": get-text-color
 
 /* States */
@@ -151,7 +151,7 @@
   )
 
   /* Paragraphs */
-  set par(leading: 0.8em, first-line-indent: 15pt, justify: false)
+  set par(leading: 0.8em, justify: false)
   show par: set block(spacing: 0.8em)
 
   /* Fonts */
@@ -163,6 +163,11 @@
 
   /* Links (we don't color references) */
   show link: set text(fill: palette-overrides.primary)
+
+  /* Tables and figures */
+  show table.cell.where(y: 0): strong
+  set table(fill: table-fill, stroke: table-stroke, align: left,
+            inset: (top: 0.65em, bottom: 0.65em))
 
   /* Don't outline or bookmark the headings by default (we're going to hijack
      the syntax and move them into the slide headers). */

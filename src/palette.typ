@@ -54,3 +54,16 @@
     display-header: primary,
   )
 }
+
+/* Table fill pattern */
+#let table-fill = (_, y) => {
+  if calc.even(y) and y > 0 { luma(240) } else { white }
+}
+
+/* Table stroke pattern */
+#let table-stroke = (x, y) => (
+  left: 0pt,
+  right: 0pt,
+  top: if y == 0 { 1.2pt } else if y == 1 { 0.7pt } else { 0pt },
+  bottom: 1.2pt,
+)

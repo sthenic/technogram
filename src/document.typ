@@ -1,4 +1,4 @@
-#import "palette.typ": DEFAULT-PALETTE, update-palette, generate-admonition-palette
+#import "palette.typ": DEFAULT-PALETTE, update-palette, generate-admonition-palette, table-fill, table-stroke
 #import "metadata.typ": get-metadata, update-metadata
 #import "raw-links.typ" as _raw-links
 #import "requirements.typ" as _requirements
@@ -55,19 +55,6 @@
     [Page #counter(page).display("1") of #final-page]
   )
 }
-
-/* Table fill pattern */
-#let _table-fill = (_, y) => {
-  if calc.even(y) and y > 0 { luma(240) } else { white }
-}
-
-/* Table stroke pattern */
-#let _table-stroke = (x, y) => (
-  left: 0pt,
-  right: 0pt,
-  top: if y == 0 { 1.2pt } else if y == 1 { 0.7pt } else { 0pt },
-  bottom: 1.2pt,
-)
 
 #let _title-page(metadata, logotype, palette) = {
   /* Suppress the footer and remove the header metadata. */
@@ -268,7 +255,7 @@
 
   /* Tables and figures */
   show table.cell.where(y: 0): strong
-  set table(fill: _table-fill, stroke: _table-stroke, align: left,
+  set table(fill: table-fill, stroke: table-stroke, align: left,
             inset: (top: 0.65em, bottom: 0.65em))
   show figure.where(kind: table): set figure.caption(position: top)
   show figure.where(kind: table): set block(inset: (left: 5%, right: 5%))
