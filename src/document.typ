@@ -173,6 +173,7 @@
   date: sys.inputs.at("date", default: datetime.today().display()),
   url: none,
   logotype: none,
+  backmatter: none,
   show-title-page: true,
   show-outline: true,
   font: "Liberation Sans",
@@ -348,10 +349,14 @@
 
   /* FIXME: Probably need referenceable enumeration items with https://gist.github.com/PgBiel/23a116de4a235ad4cf6c7a05d6648ca9 */
 
+  /* Typeset the document body. */
   body
 
   /* Check for duplicate requirements. */
   _requirements.check-for-duplicates()
+
+  /* Typeset any backmatter. */
+  backmatter
 }
 
 /* Insert unnumbered pages w/o header and footer at the end of the document. */
