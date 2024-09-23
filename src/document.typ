@@ -403,3 +403,9 @@
     })
   }
 )
+
+#let appendix(body) = {
+  set heading(numbering: "A.1  ", supplement: [Appendix])
+  counter(heading).update(0)
+  body
+}
