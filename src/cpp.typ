@@ -111,7 +111,7 @@
     #grid(
       columns: (20pt, 1fr, auto),
       align: left + bottom,
-      row-gutter: 6pt,
+      row-gutter: 0.8em,
       /* The opening row. */
       grid.cell(colspan: 2)[
         #raw(opening-text, lang: "cpp")
