@@ -1,14 +1,14 @@
 /* Return content where any markers in the `text` have been replaced with link
    objects. If no markers exist, `default` is returned. */
-#let _markers-to-links(text, default) = {
-  let matches = text.matches(regex("jdztDE(\w+)zRVeVY"))
+#let _markers-to-links(raw-text, default) = {
+  let matches = raw-text.matches(regex("jdztDE(\w+)zRVeVY"))
   if matches.len() > 0 {
     let content = []
     let index = 0
 
     for match in matches {
       if index < match.start {
-        content += text.slice(index, match.start)
+        content += raw-text.slice(index, match.start)
       }
 
       let link-text = match.text
@@ -16,32 +16,24 @@
         .replace("IbXRuT", "::")
         .replace("zRVeVY", "")
 
-      /* Insert "zero-valued" whitespace at reasonable locations (Pascal and
-         snake case separators) to encourage discretionary breaks. */
-      let insert-discretionary-breaks(text) = {
-        text
-          .replace(regex("[a-z][A-Z]"), x => { x.text.at(0) + sym.zws + x.text.at(1) })
-          .replace("_", "_" + sym.zws)
-      }
-
       let split = link-text.split("::")
       if split.len() > 1 {
-        content += link(label(link-text), insert-discretionary-breaks(split.at(1)))
+        content += link(label(link-text), text(hyphenate: true, split.at(1)))
       } else {
-        content += link(label(link-text), insert-discretionary-breaks(link-text))
+        content += link(label(link-text), text(hyphenate: true, link-text))
       }
 
       index = match.end
     }
 
     /* Copy any remainder */
-    if index < text.len() {
-      content += text.slice(index)
+    if index < raw-text.len() {
+      content += raw-text.slice(index)
     }
 
     content
   } else {
-    /* TODO: Still run insert-discretionary-breaks for raw text here? Could be nice. */
+    /* TODO: Use text(hyphenate: true) here too? Could be nice. */
     default
   }
 }
@@ -63,6 +55,8 @@
        replacement using a regex with negative look-ahead assertion for `::`,
        but instead we'll have to undo the marker wrapping when we get a match in
        phase two. */
+
+    /* FIXME: Manually look ahead instead? */
 
     let text-with-markers = it.text
     let seen = ()
