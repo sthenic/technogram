@@ -1,7 +1,7 @@
 /* Return content where any markers in the `text` have been replaced with link
    objects. If no markers exist, `default` is returned. */
 #let _markers-to-links(text, default) = {
-  let matches = text.matches(regex("jdztDE(\w+?)zRVeVY"))
+  let matches = text.matches(regex("jdztDE(\w+)zRVeVY"))
   if matches.len() > 0 {
     let content = []
     let index = 0
