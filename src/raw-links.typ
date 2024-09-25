@@ -51,17 +51,16 @@
        same term may occur multiple times within the text. Moreover, we have to
        do this in two phases since the first part of a scoped link is a linkable
        object on its own but, when followed by `::`, should be considered
-       together with the next part. Ideally, we would be able to do the
-       replacement using a regex with negative look-ahead assertion for `::`,
-       but instead we'll have to undo the marker wrapping when we get a match in
-       phase two. */
-
-    /* FIXME: Manually look ahead instead? */
+       together with the next part. */
 
     let text-with-markers = it.text
     let seen = ()
     for match in text-with-markers.matches(regex("\w+")) {
-      if query(label(match.text)).len() > 0 and match.text not in seen {
+      if (
+        it.text.at(match.end, default: none) != ":"
+        and query(label(match.text)).len() > 0
+        and match.text not in seen
+      ) {
         text-with-markers = text-with-markers
           .replace(match.text, "jdztDE" + match.text + "zRVeVY")
         seen.push(match.text)
@@ -69,14 +68,10 @@
     }
 
     for match in text-with-markers.matches(regex("\w+::\w+")) {
-      let text = match.text
-        .replace("jdztDE", "")
-        .replace("zRVeVY", "")
-
-      if query(label(text)).len() > 0 and text not in seen {
+      if query(label(match.text)).len() > 0 and match.text not in seen {
         text-with-markers = text-with-markers
-          .replace(match.text, "jdztDE" + text.replace("::", "IbXRuT") + "zRVeVY")
-        seen.push(text)
+          .replace(match.text, "jdztDE" + match.text.replace("::", "IbXRuT") + "zRVeVY")
+        seen.push(match.text)
       }
     }
 
