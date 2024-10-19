@@ -151,8 +151,7 @@
   )
 
   /* Paragraphs */
-  set par(leading: 0.8em, justify: false)
-  show par: set block(spacing: 0.8em)
+  set par(leading: 0.8em, spacing: 0.8em, justify: false)
 
   /* Fonts */
   set text(font: font, size: fontsize)

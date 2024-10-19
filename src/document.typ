@@ -218,8 +218,7 @@
   )
 
   /* Paragraphs */
-  set par(leading: 0.8em, first-line-indent: 15pt, justify: true)
-  show par: set block(spacing: 0.8em)
+  set par(leading: 0.8em, spacing: 0.8em, first-line-indent: 15pt, justify: true)
 
   /* Fonts */
   set text(font: font, size: fontsize)
