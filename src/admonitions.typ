@@ -38,7 +38,7 @@
     ],
   ).filter(x => x != none)
 
-  block(breakable: breakable)[
+  block(breakable: breakable, spacing: 1.5em)[
     #grid(
       columns: (gutter, 100% - gutter),
       ..cells
