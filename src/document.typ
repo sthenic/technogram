@@ -258,7 +258,6 @@
   set table(fill: table-fill, stroke: table-stroke, align: left,
             inset: (top: 0.65em, bottom: 0.65em))
   show figure.where(kind: table): set figure.caption(position: top)
-  show figure.where(kind: table): set block(inset: (left: 5%, right: 5%))
   show figure: set block(above: 3em , below: 3em, breakable: false)
   set figure(gap: 1.5em)
 
