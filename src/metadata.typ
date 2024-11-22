@@ -21,3 +21,6 @@
 
 /* Convenience function to avoid exporting the state variable directly. */
 #let get-metadata() = metadata.get()
+
+/* Convenience function to get the target value wrapped in a context. */
+#let get-metadata-value(key) = context metadata.get().at(key)
