@@ -276,10 +276,13 @@
   }
 
   /* Lists */
-  set list(indent: 1.5em, body-indent: 1em)
+  show list: set block(above: 1.5em, below: 1.5em)
+  show enum: set block(above: 1.5em, below: 1.5em)
+  set list(indent: 1.5em, body-indent: 1em, spacing: 1.5em)
   set enum(
     indent: 1.5em,
     body-indent: 1em,
+    spacing: 1.5em,
     number-align: start + top,
     full: true,
     numbering: (..n) => {
