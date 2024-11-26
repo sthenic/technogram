@@ -20,7 +20,7 @@
 
   for req in reqs.pos() {
     let title = prefix + [#req.number]
-    cells.push(grid.cell( [
+    cells.push(grid.cell(breakable: false)[
       /* Hidden figure with special 'kind' to create an achor point for future references. */
       #hide(place[#figure(
         none,
@@ -30,16 +30,16 @@
         outlined: true,
       )#if req.label != none { label(req.label) }])
       #text(size: 0.8em, style: "italic")[#title]
-    ]))
+    ])
     cells.push(grid.cell(breakable: true, req.body))
   }
 
-  grid(
-    columns: (75pt, auto),
+  block(above: 2em, below: 2em, grid(
+    columns: (50pt, auto),
     column-gutter: 0.5em,
     row-gutter: 1.5em,
     ..cells,
-  )
+  ))
 }
 
 /* Add a requirement. */
@@ -57,7 +57,7 @@
 
 /* Add a requirement comment as a separate block with emphasized text. */
 #let reqcomment(body) = {
-  block(emph(body))
+  block(above: 1.5em, below: 1.5em, emph(body))
 }
 
 /* Hook to check for duplicate requirements (ideally once at the end). */
