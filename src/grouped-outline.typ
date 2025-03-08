@@ -29,6 +29,7 @@
   default-group,
 ) = context {
   /* Custom outline entry to remove the supplement (prefix). */
+  set outline.entry(fill: repeat[#h(3pt).#h(3pt)])
   show outline.entry: it => {
     it.indented(none, it.inner())
   }

@@ -125,6 +125,7 @@
 /* Outline with custom styling applied in a scope so as not to affect other outlines. */
 #let _outline() = {
   /* Remove the leaders from the topmost outline entries. */
+  set outline.entry(fill: repeat[#h(3pt).#h(3pt)])
   show outline.entry.where(level: 1): set outline.entry(fill: none)
 
   /* Set the link color to black. This rule only applies locally. */
