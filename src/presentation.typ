@@ -102,13 +102,14 @@
   )
 }
 
-#let _outline(logotype) = context {
-  show outline: set par(leading: 0.8em, first-line-indent: 0pt)
-  show outline.entry: it => { strong(it.body) }
+#let _outline(logotype) = {
+  show outline.entry: it => {
+    it.indented(none, strong(it.body()))
+  }
 
   /* The outline is typeset on a custom page without a heading that shows up in the outline. */
   set page(columns: 2, header: _header(title: "Contents", logotype))
-  outline(title: none)
+  outline()
 }
 
 #let presentation(
@@ -190,7 +191,9 @@
       if _current-title.get() != none and _current-title.get() != it.body {
         _outline-title.update(true)
       }
-      _current-title.update(it.body)
+      /* FIXME: For some reason we need to add some empty element: "" or [];
+                otherwise it won't update... */
+      _current-title.update(it.body + [])
       if insert-pagebreak {
         pagebreak()
       }
