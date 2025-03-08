@@ -1,4 +1,4 @@
-[![TYPST](https://img.shields.io/badge/Typst-0.12.0-orange.svg?style=flat-square)](https://typst.app)
+[![TYPST](https://img.shields.io/badge/Typst-0.13.0-orange.svg?style=flat-square)](https://typst.app)
 [![LICENSE](https://img.shields.io/badge/license-MIT-blue.svg?style=flat-square)](https://opensource.org/licenses/MIT)
 
 # Technogram

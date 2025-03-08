@@ -124,39 +124,22 @@
 
 /* Outline with custom styling applied in a scope so as not to affect other outlines. */
 #let _outline() = {
-  // TODO: The spacing between the heading number and the label is rather small but fine
-  //       with a space at the end in heading.numbering, acceptable workaround?
-  set outline(indent: auto)
-  show outline: set par(leading: 0.8em, first-line-indent: 0pt)
+  /* Remove the leaders from the topmost outline entries. */
+  show outline.entry.where(level: 1): set outline.entry(fill: none)
 
-  // From https://stackoverflow.com/questions/77031078/how-to-remove-numbers-from-outline
+  /* Set the link color to black. This rule only applies locally. */
+  show link: set text(fill: black)
+
+  /* Modify the outline entry to bold the topmost outline entries. */
   show outline.entry: it => {
-    if it.at("label", default: none) == <technogram-outline-entry> {
-      it
+    let body = if it.level == 1 {
+      v(2em, weak: true)
+      strong(it.indented(it.prefix(), it.inner()))
     } else {
-      let fill = if it.level > 1 { repeat[#h(3pt).#h(3pt)] } else []
-
-      let body = if it.level == 1 {
-        v(20pt, weak: true)
-        strong(it.body)
-      } else {
-        it.body
-      }
-
-      let page = if it.level == 1 {
-        strong(it.page)
-      } else {
-        it.page
-      }
-
-      [#outline.entry(
-        it.level,
-        it.element,
-        body,
-        fill,
-        page
-      )<technogram-outline-entry>]
+      it.indented(it.prefix(), it.inner())
     }
+
+    link(it.element.location(), body)
   }
 
   outline()

@@ -28,23 +28,9 @@
   supplement,
   default-group,
 ) = context {
-  show outline: set par(leading: 0.8em, first-line-indent: 0pt)
-  set outline(fill: repeat[#h(3pt).#h(3pt)])
-
-  /* Custom outline entry to remove the supplement. */
+  /* Custom outline entry to remove the supplement (prefix). */
   show outline.entry: it => {
-    if it.at("label", default: none) == <technogram-grouped-outline-entry> {
-      it
-    } else {
-      let indent = if show-title and it.element.kind != default-group { h(2em) } else { none }
-      [#outline.entry(
-        it.level,
-        it.element,
-        indent + it.element.caption.body,
-        it.fill,
-        it.page
-      )<technogram-grouped-outline-entry>]
-    }
+    it.indented(none, it.inner())
   }
 
   /* Determine which object groups to include in the outline. */
@@ -69,6 +55,7 @@
       if show-title and group != default-group {
         /* Attempt to locate the page of any label with the same name as the group.
            We have to gate behind a `query` because `locate` must be successful. */
+        v(1.2em, weak: true)
         let (label, page) = if query(label(group)).len() > 0 {
           let location = locate(label(group))
           (link(location)[#text(weight: "bold", fill: text.fill)[#group]], strong[#location.page()])
