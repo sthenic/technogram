@@ -1,6 +1,3 @@
-/* Convenience functions to generate grouped outlines.  */
-#import "keep-with-next.typ": *
-
 /* We use a figure (taking up no space on the page) to place an outlineable item
    so that we can construct a custom outline later on. We set the kind based on
    the group and the supplement to something that all objects will have in
@@ -65,7 +62,7 @@
         }
 
         /* We keep the heading together with the first entry. */
-        keep-with-next(threshold: 2em)[
+        block(sticky: true)[
           #grid(
             columns: (auto, 1fr),
             align: (left, right),
