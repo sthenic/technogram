@@ -1,6 +1,7 @@
 #import "descriptions.typ": *
 #import "admonitions.typ": *
 #import "tree.typ": *
+#import "signatures.typ": *
 #import "cpp.typ" as cpp
 #import "registers.typ" as reg
 #import "presentation.typ": presentation
