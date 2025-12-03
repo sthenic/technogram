@@ -152,7 +152,7 @@
   )
 
   /* Paragraphs */
-  set par(leading: 0.8em, spacing: 0.8em, justify: false)
+  set par(leading: 0.8em, spacing: 1.2em, justify: false)
 
   /* Fonts */
   set text(font: font, size: fontsize)
@@ -181,16 +181,17 @@
   show heading.where(level: 1): it => context {
     /* If the current title has yet to be set, we're dealing with the first one.
        Otherwise, we insert a pagebreak, but not before updating the title to
-       allow the header to reflect the new title. Additionally, if the title
-       changes we toggle the outline state so this heading location is
-       included in the outline. */
+       allow the header to reflect the new title. This only gets run when the
+       user actually adds a new top-level heading, and not for each page
+       (if the content overflows). */
     if it.at("label", default: none) == <technogram-presentation-heading> {
       it
     } else {
       let insert-pagebreak = _current-title.get() != none
-      if _current-title.get() != none and _current-title.get() != it.body {
+      if _current-title.get() != none {
         _outline-title.update(true)
       }
+
       /* FIXME: For some reason we need to add some empty element: "" or [];
                 otherwise it won't update... */
       _current-title.update(it.body + [])
