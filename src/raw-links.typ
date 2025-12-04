@@ -39,6 +39,15 @@
 }
 
 #let _insert-markers(raw-text) = {
+  /* Check for identifiers and scoped parameters with a matching link in the
+     document. These get marked with a set of random letters to preserve the
+     identifier through the syntax highlighting stage (mostly affects `::`). We
+     have to be careful to only consider unique replacements because the same
+     term may occur multiple times within the text. Moreover, we have to do this
+     in two phases since the first part of a scoped link is a linkable object on
+     its own but, when followed by `::`, should be considered together with the
+     next part. */
+
   let seen = ()
   let text-with-markers = raw-text
   for match in text-with-markers.matches(regex("\w+")) {
@@ -64,51 +73,98 @@
   text-with-markers
 }
 
+#let _lex-and-insert-markers(text) = {
+  let pos = 0
+  let text-with-markers = ()
+
+  /* Separate the two styles of comments from all other text with a simple
+     lexer. Unfortunately, we have to keep all the logic in the loop since
+     functions have to be pure (and thus cannot modify the lexer state). */
+
+  /* FIXME: Lexing space delimited strings may be the way to go since
+  struct ADQParameters = somethin + ADQParameters::sampling_frequency;
+  does not get replaced correctly otherwise. */
+
+  let segment = ""
+  while true {
+    if pos >= text.len() {
+      break
+    }
+
+    let c = text.at(pos)
+    if c == "/" {
+      /* Eject any ongoing segment, we're about to start a comment. */
+      if segment.len() > 0 {
+        text-with-markers.push(_insert-markers(segment))
+        segment = "/"
+      }
+
+      /* Peek at the next character to determine the type of comment. */
+      let next = text.at(pos + 1, default: none)
+      if next == "/" {
+        segment += "/"
+        pos += 2
+        while true {
+          c = text.at(pos, default: none)
+          segment += c
+          pos += 1
+
+          /* A line comment keeps going until we encounter a newline or
+             reach the end of the buffer. */
+          if c in ("\n", none) {
+            text-with-markers.push(segment)
+            segment = ""
+            break
+          }
+        }
+      } else if next == "*" {
+        segment += "*"
+        pos += 2
+        while true {
+          c = text.at(pos, default: none)
+          segment += c
+          pos += 1
+
+          /* A block comment keeps going until we encounter the first stop
+             sequence or reach the end of the buffer. */
+          next = text.at(pos, default: none)
+          if c == "*" and next in ("/", none) {
+            text-with-markers.push(segment + next)
+            segment = ""
+            pos += 1
+            break
+          }
+        }
+      } else {
+        /* The single forward slash has already been added to the segment which
+           we've determined isn't a comment. Regardless of whether we've
+           encountered a valid character or reached the end of the buffer, let
+           the next pass handle it. */
+        pos += 1
+      }
+    } else {
+      segment += c
+      pos += 1
+    }
+  }
+
+  /* Any remaining segment is not a comment. */
+  if segment.len() > 0 {
+    text-with-markers.push(_insert-markers(segment))
+  }
+
+  text-with-markers.join()
+}
+
 /* Hook into `raw` to replace special matching text with custom markers. */
 #let format-raw(it) = {
   if it.at("label", default: none) == <technogram-modified-raw> {
     it
   } else {
 
-    /* Check for identifiers and scoped parameters with a matching link in the
-       document. These get marked with a set of random letters to preserve the
-       identifier through the syntax highlighting stage (mostly affects `::`).
-       We have to be careful to only consider unique replacements because the
-       same term may occur multiple times within the text. Moreover, we have to
-       do this in two phases since the first part of a scoped link is a linkable
-       object on its own but, when followed by `::`, should be considered
-       together with the next part. */
-
-    let text-with-markers = ()
-    let in-block-comment = false
-
-    for line in it.text.split("\n") {
-      /* Run marker insertion for any text that's not inside a comment. */
-      if in-block-comment {
-        if line.position("*/") != none {
-          in-block-comment = false
-        }
-        text-with-markers.push(line)
-      } else if line.position(regex("^\s*\/\/")) != none {
-        /* A line comment starts on this line and is only preceded by whitespace. */
-        text-with-markers.push(line)
-      } else if line.position(regex("^\s*\/\*")) != none {
-        /* A block comment starts on this line and is only preceded by whitespace. */
-        text-with-markers.push(line)
-        if line.position("*/") == none {
-          in-block-comment = true
-        }
-      } else if line.position(regex("\/\*.*\*\/$")) != none {
-        /* A comment at the end of the line. */
-        let segments = line.split("/*")
-        text-with-markers.push(_insert-markers(segments.at(0)) + segments.slice(1).join("/*"))
-      } else {
-        text-with-markers.push(_insert-markers(line))
-      }
-    }
 
     [#raw(
-      text-with-markers.join("\n"),
+      _lex-and-insert-markers(it.text),
       block: it.block,
       lang: it.lang,
       align: it.align,
