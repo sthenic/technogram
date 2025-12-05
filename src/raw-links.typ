@@ -38,39 +38,15 @@
   }
 }
 
-#let _insert-markers(raw-text) = {
+#let _insert-markers(identifier) = {
   /* Check for identifiers and scoped parameters with a matching link in the
      document. These get marked with a set of random letters to preserve the
-     identifier through the syntax highlighting stage (mostly affects `::`). We
-     have to be careful to only consider unique replacements because the same
-     term may occur multiple times within the text. Moreover, we have to do this
-     in two phases since the first part of a scoped link is a linkable object on
-     its own but, when followed by `::`, should be considered together with the
-     next part. */
-
-  let seen = ()
-  let text-with-markers = raw-text
-  for match in text-with-markers.matches(regex("\w+")) {
-    if (
-      raw-text.at(match.end, default: none) != ":"
-      and query(label(match.text)).len() > 0
-      and match.text not in seen
-    ) {
-      text-with-markers = text-with-markers
-        .replace(match.text, "jdztDE" + match.text + "zRVeVY")
-      seen.push(match.text)
-    }
+     identifier through the syntax highlighting stage (mostly affects `::`). */
+  if query(label(identifier)).len() > 0 {
+    "jdztDE" + identifier.replace("::", "IbXRuT") + "zRVeVY"
+  } else {
+    identifier
   }
-
-  for match in text-with-markers.matches(regex("\w+::\w+")) {
-    if query(label(match.text)).len() > 0 and match.text not in seen {
-      text-with-markers = text-with-markers
-        .replace(match.text, "jdztDE" + match.text.replace("::", "IbXRuT") + "zRVeVY")
-      seen.push(match.text)
-    }
-  }
-
-  text-with-markers
 }
 
 #let _lex-and-insert-markers(text) = {
@@ -81,10 +57,6 @@
      lexer. Unfortunately, we have to keep all the logic in the loop since
      functions have to be pure (and thus cannot modify the lexer state). */
 
-  /* FIXME: Lexing space delimited strings may be the way to go since
-  struct ADQParameters = somethin + ADQParameters::sampling_frequency;
-  does not get replaced correctly otherwise. */
-
   let segment = ""
   while true {
     if pos >= text.len() {
@@ -92,18 +64,42 @@
     }
 
     let c = text.at(pos)
-    if c == "/" {
+    if c.match(regex("[a-zA-z]")) != none {
+      /* Eject any ongoing segment without inserting markers, we're about to
+         start an identifier. */
+      if segment.len() > 0 {
+        text-with-markers.push(segment)
+      }
+      segment = c
+      pos += 1
+
+      while true {
+        c = text.at(pos, default: none)
+        if c == none or c.match(regex("[a-zA-Z0-9_:]")) == none {
+          /* End of the buffer or the identifier. Do not claim the character by
+             advancing the buffer position. */
+          text-with-markers.push(_insert-markers(segment))
+          segment = ""
+          break
+        } else {
+          segment += c
+          pos += 1
+        }
+      }
+    } else if c == "/" {
       /* Eject any ongoing segment, we're about to start a comment. */
       if segment.len() > 0 {
-        text-with-markers.push(_insert-markers(segment))
-        segment = "/"
+        text-with-markers.push(segment)
       }
 
+      segment = "/"
+      pos += 1
+
       /* Peek at the next character to determine the type of comment. */
-      let next = text.at(pos + 1, default: none)
+      let next = text.at(pos, default: none)
       if next == "/" {
         segment += "/"
-        pos += 2
+        pos += 1
         while true {
           c = text.at(pos, default: none)
           segment += c
@@ -119,7 +115,7 @@
         }
       } else if next == "*" {
         segment += "*"
-        pos += 2
+        pos += 1
         while true {
           c = text.at(pos, default: none)
           segment += c
@@ -128,29 +124,24 @@
           /* A block comment keeps going until we encounter the first stop
              sequence or reach the end of the buffer. */
           next = text.at(pos, default: none)
-          if c == "*" and next in ("/", none) {
+          if next == none or c == "*" and next == "/" {
             text-with-markers.push(segment + next)
             segment = ""
             pos += 1
             break
           }
         }
-      } else {
-        /* The single forward slash has already been added to the segment which
-           we've determined isn't a comment. Regardless of whether we've
-           encountered a valid character or reached the end of the buffer, let
-           the next pass handle it. */
-        pos += 1
       }
     } else {
+      /* Any other type of character just gets added to the segment. */
       segment += c
       pos += 1
     }
   }
 
-  /* Any remaining segment is not a comment. */
+  /* Any remaining segment is neither a comment nor an identifier. */
   if segment.len() > 0 {
-    text-with-markers.push(_insert-markers(segment))
+    text-with-markers.push(segment)
   }
 
   text-with-markers.join()
@@ -161,7 +152,6 @@
   if it.at("label", default: none) == <technogram-modified-raw> {
     it
   } else {
-
 
     [#raw(
       _lex-and-insert-markers(it.text),
