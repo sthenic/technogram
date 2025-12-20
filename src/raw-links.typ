@@ -38,18 +38,28 @@
   }
 }
 
-#let _insert-markers(identifier) = {
+#let _insert-markers(identifier, ignore-prefix) = {
   /* Check for identifiers and scoped parameters with a matching link in the
      document. These get marked with a set of random letters to preserve the
-     identifier through the syntax highlighting stage (mostly affects `::`). */
+     identifier through the syntax highlighting stage (mostly affects `::`).
+     If we're instructed to ignore prefixes, we query for a matching link after
+     removing the characters up to and including the first underscore. */
   if query(label(identifier)).len() > 0 {
-    "jdztDE" + identifier.replace("::", "IbXRuT") + "zRVeVY"
-  } else {
-    identifier
+    return "jdztDE" + identifier.replace("::", "IbXRuT") + "zRVeVY"
+  } else if ignore-prefix {
+    let split = identifier.split("_")
+    if split.len() > 1 {
+      let id = split.slice(1).join("_")
+      if query(label(id)).len() > 0 {
+        return split.at(0) + "_jdztDE" + id.replace("::", "IbXRuT") + "zRVeVY"
+      }
+    }
   }
+
+  return identifier
 }
 
-#let _lex-and-insert-markers(text) = {
+#let _lex-and-insert-markers(text, ignore-prefix) = {
   let pos = 0
   let text-with-markers = ()
 
@@ -78,7 +88,7 @@
         if c == none or c.match(regex("[a-zA-Z0-9_:]")) == none {
           /* End of the buffer or the identifier. Do not claim the character by
              advancing the buffer position. */
-          text-with-markers.push(_insert-markers(segment))
+          text-with-markers.push(_insert-markers(segment, ignore-prefix))
           segment = ""
           break
         } else {
@@ -148,13 +158,12 @@
 }
 
 /* Hook into `raw` to replace special matching text with custom markers. */
-#let format-raw(it) = {
+#let format-raw(it, ignore-prefix: false) = {
   if it.at("label", default: none) == <technogram-modified-raw> {
     it
   } else {
-
     [#raw(
-      _lex-and-insert-markers(it.text),
+      _lex-and-insert-markers(it.text, ignore-prefix),
       block: it.block,
       lang: it.lang,
       align: it.align,
