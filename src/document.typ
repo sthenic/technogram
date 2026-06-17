@@ -244,9 +244,14 @@
 
   /* Tables and figures */
   show table.cell.where(y: 0): strong
+  show table.cell: set par(justify: false)
   set table(fill: table-fill, stroke: table-stroke, align: left,
             inset: (top: 0.65em, bottom: 0.65em))
-  show figure.where(kind: table): set figure.caption(position: top)
+  show figure.where(kind: table): it => {
+    set block(breakable: true)
+    block(sticky: true, below: it.gap, it.caption)
+    block(above: 0pt, it.body)
+  }
   show figure: set block(above: 3em , below: 3em, breakable: false)
   set figure(gap: 1.5em)
 
