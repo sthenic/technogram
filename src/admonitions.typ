@@ -1,16 +1,37 @@
 #import "common.typ": get-text-color
 #import "palette.typ": get-palette
 
+#let _admonition-html(header-color, body-color, header, symbol, gutter, body) = {
+  html.div(class: "tg-admonition")[
+    #if gutter != 0pt {
+      html.div(
+        class: "tg-admonition-gutter",
+        style: "width:" + repr(gutter) + "; background:" + header-color.to-hex())[]
+    }
+    #html.div(class: "tg-admonition-content")[
+      #if header != none {
+        html.div(
+          class: "tg-admonition-header",
+          style: ("background:" + header-color.to-hex() +
+                  ";color:" + get-text-color(header-color).to-hex())
+        )[
+          #if symbol != none { html.span(class: "tg-fa-icon")[#symbol] }
+          #header
+        ]
+      }
+      #html.div(
+        class: "tg-admonition-body",
+        style: ("background:" + body-color.to-hex() +
+                ";color:" + get-text-color(body-color).to-hex())
+      )[
+        #body
+      ]
+    ]
+  ]
+}
+
 /* TODO: Avoid inheriting indentation w/ https://stackoverflow.com/a/78185552 */
-#let admonition(
-  header-color,
-  body-color,
-  header: none,
-  symbol: none,
-  gutter: 0pt,
-  breakable: false,
-  body
-) = {
+#let _admonition-pdf(header-color, body-color, header, symbol, gutter, breakable, body) = {
   let inset = 0.5em
   let cells = (
     if header != none {
@@ -44,8 +65,23 @@
       ..cells
     )
   ]
-
   /* TODO: Wishlist: add some vertical space if a list is the last thing in the box. */
+}
+
+#let admonition(
+  header-color,
+  body-color,
+  header: none,
+  symbol: none,
+  gutter: 0pt,
+  breakable: false,
+  body
+) = {
+  context if target() == "html" {
+    _admonition-html(header-color, body-color, header, symbol, gutter, body)
+  } else {
+    _admonition-pdf(header-color, body-color, header, symbol, gutter, breakable, body)
+  }
 }
 
 /* A note */

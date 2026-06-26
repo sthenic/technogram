@@ -10,41 +10,50 @@
   caption,
   group,
   default-group,
-) = hide(box(height: 0pt, figure(
-  none,
-  kind: if group != none { group } else { default-group },
-  supplement: default-group,
-  caption: caption,
-  outlined: true,
-)))
+) = {
+  let entry = figure(
+    none,
+    kind: if group != none { group } else { default-group },
+    supplement: default-group,
+    caption: caption,
+    outlined: true,
+  )
+  context if target() == "html" {
+    html.div(hidden: true)[#entry]
+  } else {
+    hide(box(height: 0pt, entry))
+  }
+}
 
-/* Insert a grouped outline, optionally filtering on a list of groups. */
-#let grouped-outline(
-  groups,
-  show-title,
-  supplement,
-  default-group,
-) = context {
+#let _grouped-outline-html(outline-groups, show-title, default-group) = {
+  html.nav(class: "tg-grouped-outline")[
+    #for group in outline-groups {
+      let items = query(figure.where(kind: group))
+      if items.len() > 0 {
+        if show-title and group != default-group {
+          html.h4(class: "tg-grouped-outline-title")[
+            #if query(label(group)).len() > 0 {
+              link(label(group))[#group]
+            } else {
+              group
+            }
+          ]
+        }
+        html.ul()[
+          #for item in items {
+            html.li()[#link(item.location())[#item.caption.body]]
+          }
+        ]
+      }
+    }
+  ]
+}
+
+#let _grouped-outline-pdf(outline-groups, show-title, default-group) = {
   /* Custom outline entry to remove the supplement (prefix). */
   set outline.entry(fill: repeat[#h(3pt).#h(3pt)])
   show outline.entry: it => {
     it.indented(none, it.inner())
-  }
-
-  /* Determine which object groups to include in the outline. */
-  let outline-groups = if groups != none {
-    groups
-  } else {
-    /* Put the objects without a group first. */
-    let result = ()
-    result.push(default-group)
-    /* Query by the supplement and push unique entries using the `kind` field. */
-    for it in query(figure.where(supplement: supplement)) {
-      if it.kind not in result {
-        result.push(it.kind)
-      }
-    }
-    result
   }
 
   for group in outline-groups {
@@ -76,5 +85,35 @@
       title: none,
       target: figure.where(kind: group)
     )
+  }
+}
+
+/* Insert a grouped outline, optionally filtering on a list of groups. */
+#let grouped-outline(
+  groups,
+  show-title,
+  supplement,
+  default-group,
+) = context {
+  /* Determine which object groups to include in the outline. */
+  let outline-groups = if groups != none {
+    groups
+  } else {
+    /* Put the objects without a group first. */
+    let result = ()
+    result.push(default-group)
+    /* Query by the supplement and push unique entries using the `kind` field. */
+    for it in query(figure.where(supplement: supplement)) {
+      if it.kind not in result {
+        result.push(it.kind)
+      }
+    }
+    result
+  }
+
+  if target() == "html" {
+    _grouped-outline-html(outline-groups, show-title, default-group)
+  } else {
+    _grouped-outline-pdf(outline-groups, show-title, default-group)
   }
 }

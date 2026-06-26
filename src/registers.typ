@@ -29,13 +29,18 @@
   for byte in range(0, size-bytes) {
     let bit = 8 * byte
     let high = 8 * (byte + 1) - 1
+    let row = ()
 
     while bit <= high {
       let match = fields.find(x => { bit >= x.pos and bit < x.pos + x.size })
       if match != none {
         if reserved != none {
           /* Reserved field ends. */
-          result.push(grid.cell(colspan: reserved.size, stroke: 1pt)[`-`])
+          if target() == "html" {
+            row.push(html.td(colspan: reserved.size, class: "tg-reg-reserved")[\u{2013}])
+          } else {
+            result.push(grid.cell(colspan: reserved.size, stroke: 1pt)[`-`])
+          }
           reserved = none
         }
 
@@ -55,7 +60,11 @@
           }
         )
 
-        result.push(grid.cell(colspan: slice-size, stroke: 1pt)[#slice-label])
+        if target() == "html" {
+          row.push(html.td(colspan: slice-size, class: "tg-reg-field")[#slice-label])
+        } else {
+          result.push(grid.cell(colspan: slice-size, stroke: 1pt)[#slice-label])
+        }
         bit += slice-size
       } else if reserved != none {
         /* Extending the reserved field. */
@@ -70,8 +79,18 @@
 
     /* Add any reserved field trailing at the end of the byte. */
     if reserved != none {
-      result.push(grid.cell(colspan: reserved.size, stroke: 1pt)[`-`])
+      if target() == "html" {
+        row.push(html.td(colspan: reserved.size, class: "tg-reg-reserved")[\u{2013}])
+      } else {
+        result.push(grid.cell(colspan: reserved.size, stroke: 1pt)[`-`])
+      }
       reserved = none
+    }
+
+    /* HTML cells needs wrapping in a table row element. We need to reverse the
+       order since we traversed the byte from low to high. */
+    if target() == "html" {
+      result.push(html.tr()[#row.rev().join()])
     }
   }
 
@@ -79,34 +98,135 @@
   result.rev()
 }
 
-/* Define a register */
-#let register(
-  name: none,
-  offset: none,
-  default: none,
-  group: none,
-  see-also: none,
-  show-descriptions: true,
-  ..fields,
-  description,
-) = context {
+#let _register-descriptions(name, size-bits, fields) = {
+  let last_lsb = size-bits
+  let seen = ()
+  for field in fields.pos().sorted(key: x => { x.pos }).rev() {
+    let field-name = name + "::" + field.name
+    let msb = field.pos + field.size - 1
+    let lsb = field.pos
 
-  /* Not having these as positional arguments leads to more readable
-     invocations. Ideally, the LSP could be leveraged for that but lookup of
-     custom functions seems a bit shaky? */
+    /* The field must be unique, reside within the register and not overlap with another field. */
+    if field.name in seen {
+      panic("Field " + field-name + " already exists in the register.")
+    }
 
-  if name == none { panic("A 'name' must be specified.") }
-  if offset == none { panic("An 'offset' must be specified.") }
-  if default == none { panic("A 'default' value must be specified.") }
-  for field in fields.pos() {
-    if field.name == none { panic("A field 'name' must be specified.") }
-    if field.pos == none { panic("A field 'pos' (position) must be specified.") }
-    if field.size == none { panic("A field 'size' must be specified.") }
+    if msb >= size-bits or lsb < 0 {
+      panic("Field " + field-name + " exceeds the bounds of the register.")
+    }
+
+    if msb >= last_lsb {
+      panic("Field " + field-name + " overlaps with another field in the register.")
+    }
+
+    let field-label = [
+      *Bit #if field.size > 1 [ #str(msb):#str(lsb) ] else { str(lsb) }* --- #raw(field.name)
+    ]
+
+    if field.short-description != none {
+      field-label += [ --- #field.short-description]
+    }
+
+    describe([
+        #field-label
+        #label(field-name)
+      ],
+      note: field.access
+    )[#field.body]
+
+    last_lsb = lsb
+    seen.push(field.name)
+  }
+}
+
+#let _register-html(
+  name,
+  offset,
+  default,
+  group,
+  see-also,
+  show-descriptions,
+  fields,
+  size-bits,
+  size-bytes,
+  description
+) = {
+  let primary = get-palette().primary.to-hex()
+
+  /* Metadata grid. */
+  let meta-rows = (
+    html.div(class: "tg-reg-name")[#html.span[*Name*] #html.span[#raw(name) #label(name)]],
+    html.div(class: "tg-reg-offset")[#html.span[*Offset*] #html.span[#raw(offset)]],
+    html.div(class: "tg-reg-default")[#html.span[*Default*] #html.span[#raw(default)]],
+  )
+
+  if group != none {
+    let group-link = if query(label(group)).len() > 0 {
+      link(label(group))[#group]
+    } else {
+      group
+    }
+    meta-rows.push(html.div(class: "tg-reg-group")[
+      #html.span[*Group*]
+      #html.span()[#group-link]
+    ])
   }
 
-  /* Add entry so we can retrieve the object for the outline. */
-  _grouped-outline.grouped-outline-entry(raw(name), group, "reg")
+  if see-also != none {
+    meta-rows.push(html.div(class: "tg-reg-see-also")[
+      #html.span[*See also*]
+      #html.span()[#see-also.join(", ")]
+    ])
+  }
 
+  let top-row = html.tr()[
+    #range(size-bits - 1, size-bits - 9, step: -1).map(x =>
+      html.th(class: "tg-reg-bit-num-top")[#str(x)]
+    ).join()
+  ]
+
+  let bottom-row = if size-bits > 8 {
+    html.tr()[
+      #range(7, -1, step: -1).map(x =>
+        html.th(class: "tg-reg-bit-num-bottom")[#str(x)]
+      ).join()
+    ]
+  } else {
+    none
+  }
+
+  html.div(class: "tg-reg-object")[
+    #html.div(class: "tg-reg-header", style: "border-top: 3px solid " + primary + ";")[
+      #html.div(class: "tg-reg-meta")[
+        #meta-rows.join()
+      ]
+    ]
+    #if description != none { html.div(class: "tg-reg-description")[#description] }
+    #html.table(class: "tg-reg-bitfield")[
+      #html.tbody()[
+        #top-row
+        #_field-cells(fields.pos(), name, show-descriptions, size-bytes).join()
+        #bottom-row
+      ]
+    ]
+    #if show-descriptions and fields.pos().len() > 0 {
+      _register-descriptions(name, size-bits, fields)
+    }
+  ]
+}
+
+#let _register-pdf(
+  name,
+  offset,
+  default,
+  group,
+  see-also,
+  show-descriptions,
+  fields,
+  size-bits,
+  size-bytes,
+  description
+) = {
   let see-also-cells = if see-also != none {
     (strong("See also"), see-also.join(", "))
   } else {
@@ -146,12 +266,6 @@
   if description != none { block[#description] }
 
   /* Add a two-dimensional view of the register. */
-  let size-bits = register-size.get()
-  let size-bytes = int(size-bits / 8)
-  if size-bits != size-bytes * 8 {
-    panic("The register size (" + str(size-bits) + ") must be divisible by 8.")
-  }
-
   let top-row = _number-cells(size-bits - 8, size-bits - 1, top: true)
   let bottom-row = if size-bits > 8 { _number-cells(0, 7, top: false) } else { none }
 
@@ -168,42 +282,50 @@
 
   /* Add the field descriptions. */
   if show-descriptions and fields.pos().len() > 0 {
-    let last_lsb = size-bits
-    let seen = ()
-    for field in fields.pos().sorted(key: x => { x.pos }).rev() {
-      let field-name = name + "::" + field.name
-      let msb = field.pos + field.size - 1
-      let lsb = field.pos
+    _register-descriptions(name, size-bits, fields)
+  }
+}
 
-      /* The field must be unique, reside within the register and not overlap with another field. */
-      if field.name in seen {
-        panic("Field " + field-name + " already exists in the register.")
-      }
-      if msb >= size-bits or lsb < 0 {
-        panic("Field " + field-name + " exceeds the bounds of the register.")
-      }
-      if msb >= last_lsb {
-        panic("Field " + field-name + " overlaps with another field in the register.")
-      }
+/* Define a register */
+#let register(
+  name: none,
+  offset: none,
+  default: none,
+  group: none,
+  see-also: none,
+  show-descriptions: true,
+  ..fields,
+  description,
+) = context {
 
-      let field-label = [
-        *Bit #if field.size > 1 [ #str(msb):#str(lsb) ] else { str(lsb) }* --- #raw(field.name)
-      ]
+  if name == none { panic("A 'name' must be specified.") }
+  if offset == none { panic("An 'offset' must be specified.") }
+  if default == none { panic("A 'default' value must be specified.") }
+  for field in fields.pos() {
+    if field.name == none { panic("A field 'name' must be specified.") }
+    if field.pos == none { panic("A field 'pos' (position) must be specified.") }
+    if field.size == none { panic("A field 'size' must be specified.") }
+  }
 
-      if field.short-description != none {
-        field-label += [ --- #field.short-description]
-      }
+  /* Add entry so we can retrieve the object for the outline. */
+  _grouped-outline.grouped-outline-entry(raw(name), group, "reg")
 
-      describe([
-          #field-label
-          #label(field-name)
-        ],
-        note: field.access
-      )[#field.body]
+  let size-bits = register-size.get()
+  let size-bytes = int(size-bits / 8)
+  if size-bits != size-bytes * 8 {
+    panic("The register size (" + str(size-bits) + ") must be divisible by 8.")
+  }
 
-      last_lsb = lsb
-      seen.push(field.name)
-    }
+  if target() == "html" {
+    _register-html(
+      name, offset, default, group, see-also, show-descriptions, fields,
+      size-bits, size-bytes, description
+    )
+  } else {
+    _register-pdf(
+      name, offset, default, group, see-also, show-descriptions, fields,
+      size-bits, size-bytes, description
+    )
   }
 }
 
@@ -225,12 +347,8 @@
     access: if access != none {
       access
     } else if read-only [
-      /* TODO: These might be confusing... */
-      #text(font: "Font Awesome 6 Free Solid", "\u{f304}")
-      #box(width: -2pt)[#text(font: "Font Awesome 6 Free Solid", "\u{f715}")]
       Read-only
     ] else if write-only [
-      #text(font: "Font Awesome 6 Free Solid", "\u{f070}")
       Write-only
     ] else { "R/W" },
     default: default,

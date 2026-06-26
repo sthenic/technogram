@@ -1,8 +1,51 @@
 #let tree-stroke = state("tree-stroke", 1pt + black)
 #let tree-depth = state("tree-depth", 20pt)
 
-/* Insert a tree. The nodes are ideally defined using the "tight" list syntax. */
-#let tree(breakable: true, body) = context {
+#let _tree-html(body) = {
+  let _tree_(content) = {
+    let body = content.body
+    if body.has("children") and body.func() != grid {
+      let filtered = body.children.filter(x => x.func() != parbreak)
+      let content-on-this-level = [#while filtered.len() > 0 and filtered.at(0).func() != list.item {
+        filtered.remove(0)
+      }]
+
+      html.li()[
+        #content-on-this-level
+        #if filtered.len() != 0 {
+          let filtered = filtered.filter(x => x != [ ])
+          html.ul()[
+            #for it in filtered {
+              _tree_(it)
+            }
+          ]
+        }
+      ]
+    } else {
+      html.li()[#body]
+    }
+  }
+
+  let filtered = body.children.filter(x => x.func() != parbreak)
+  let content-on-this-level = [#while filtered.len() > 0 and filtered.at(0).func() != list.item {
+    filtered.remove(0)
+  }]
+
+  let filtered = filtered.filter(x => x != [ ])
+
+  html.div(class: "tg-tree")[
+    #html.span(class: "tg-tree-root")[#content-on-this-level]
+    #if filtered.len() != 0 {
+      html.ul()[
+        #for it in filtered {
+          _tree_(it)
+        }
+      ]
+    }
+  ]
+}
+
+#let _tree-pdf(breakable, body) = {
   let line-height = measure("M").height
   let indent = 0pt /* TODO: Dynamically set this somehow? */
   let row-gutter = par.leading * 150%
@@ -105,15 +148,37 @@
   })
 }
 
+/* Insert a tree. The nodes are ideally defined using the "tight" list syntax. */
+#let tree(breakable: true, body) = {
+  context if target() == "html" {
+    _tree-html(body)
+  } else {
+    _tree-pdf(breakable, body)
+  }
+}
+
 /* Convenience function for a grid with cells equal in size that number as many
    as there are positional arguments. All of these grid properties can be
    overridden by supplying named arguments. The idea is to provide "sane
    defaults" to a grid object that may be used as a tree item, e.g. to create an
    annotation to the right of the leaf text. */
 #let tree-span(..any) = {
-  grid(
-    columns: (1fr,) * any.pos().len(),
-    gutter: 1em,
-    ..any
-  )
+  context if target() == "html" {
+    let cols = if "columns" in any.named() {
+      any.named().columns.map(c => repr(c)).join(" ")
+    } else {
+      any.pos().map(_ => "1fr").join(" ")
+    }
+    html.div(class: "tg-tree-span", style: "grid-template-columns: " + cols)[
+      #for item in any.pos() {
+        html.span()[#item]
+      }
+    ]
+  } else {
+    grid(
+      columns: (1fr,) * any.pos().len(),
+      gutter: 1em,
+      ..any
+    )
+  }
 }

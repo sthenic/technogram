@@ -150,53 +150,106 @@
   outline()
 }
 
-#let document(
-  title: none,
-  subtitle: none,
-  document-name: none,
-  author: none,
-  classification: "Public",
-  revision: sys.inputs.at("revision", default: none),
-  document-id: none,
-  date: sys.inputs.at("date", default: datetime.today().display()),
-  url: none,
-  logotype: none,
-  backmatter: none,
-  show-title-page: true,
-  show-outline: true,
-  show-footer: true,
-  font: "Liberation Sans",
-  monofont: "Latin Modern Mono",
-  mathfont: none,
-  fontsize: 10pt,
-  palette-overrides: none,
+#let _document-html(
+  metadata,
+  logotype,
+  footer,
+  font,
+  monofont,
+  mathfont,
+  palette,
   body,
 ) = {
+  /* FIXME: Implement footnotes */
+  show footnote: it => { none }
 
-  /* Merge the default palette with any user overrides. */
-  palette-overrides = DEFAULT-PALETTE + palette-overrides
+  /* FIXME: Unsupported functions that generate warnings if used. */
+  show v: it => { none }
+  show pagebreak: it => { none }
 
-  /* Construct the document name. */
-  if document-name == none and title != none {
-    document-name = title
-    if subtitle != none {
-      document-name += [ --- #subtitle]
-    }
+  /* Customize outline entires so that we can control alignment. */
+  show outline.entry: it => {
+    link(it.element.location())[
+      #html.span[#it.prefix()]
+      #html.span[#it.body()]
+    ]
   }
 
-  /* Pack a metadata dictionary for to pass to typesetting functions. */
-  let metadata = (
-    title: title,
-    subtitle: subtitle,
-    document-name: document-name,
-    author: author,
-    classification: classification,
-    revision: revision,
-    document-id: document-id,
-    date: date,
-    url: url,
-  )
+  /* Some CSS values propagate from the framework. */
+  let style-overrides = ("--font: '" + font + "', 'Liberation Sans', sans-serif;" +
+                         "--monofont: '" + monofont + "', 'Liberation Mono', monospace;" +
+                         "--mathfont: '" + mathfont + "', 'STIX Two Math', serif;" +
+                         "--link-color: " + palette.primary.to-hex())
 
+  html.html(lang: "en")[
+    #html.head[
+      #html.title[#metadata.document-name]
+      #html.style(read("html/styles.css"))
+      #html.link(
+        rel: "stylesheet",
+        href: "https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css",
+      )
+      #html.link(
+        rel: "stylesheet",
+        href: "https://cdn.jsdelivr.net/npm/@xz/fonts@1/serve/liberation-sans.min.css"
+      )
+      #html.link(
+        rel: "stylesheet",
+        href: "https://cdn.jsdelivr.net/npm/@xz/fonts@1/serve/liberation-mono.min.css"
+      )
+      #html.link(
+        rel: "stylesheet",
+        href: "https://cdn.jsdelivr.net/npm/@fontsource/stix-two-math@5.3.0/index.min.css"
+      )
+      #html.meta(name: "viewport", content: "width=device-width, initial-scale=1")
+      #html.meta(charset: "utf-8")
+    ]
+    #html.body(style: style-overrides)[#html.div(class: "container")[
+      #html.button(class: "sidebar-toggle", aria-label: "Toggle navigation")[]
+      #html.aside(class: "sidebar")[
+        #if logotype != none { html.div(class: "sidebar-logo")[#logotype] }
+        #html.nav[#outline(depth: 3)]
+      ]
+      #html.main(class: "content")[
+        #if metadata.title != none { html.h1(class: "content-title")[#metadata.title] }
+        #if metadata.subtitle != none or author != none {
+          html.div(class: "content-subtitle")[
+            #let format-author = if type(metadata.author) == array {
+              metadata.author.join(", ", last: " and ")
+            } else {
+              metadata.author
+            }
+            #if metadata.subtitle != none { html.span(class: "subtitle")[#metadata.subtitle] }
+            #if format-author != none { html.span(class: "author")[#format-author] }
+          ]
+        }
+        #html.div(class: "content-meta")[
+          #html.span[Document ID:] #html.span[#metadata.document-id]
+          #html.span[Revision:] #html.span[#metadata.revision]
+        ]
+        #body
+        #if footer != none { html.footer(class: "content-footer")[#footer] }
+      ]
+    ]]
+    #html.script(read("html/sidebar-highlight.js"))
+    #html.script(read("html/sidebar-toggle.js"))
+  ]
+}
+
+#let _document-pdf(
+  metadata,
+  logotype,
+  backmatter,
+  show-title-page,
+  show-outline,
+  show-footer,
+  font,
+  monofont,
+  mathfont,
+  fontsize,
+  palette,
+  body,
+) = {
   /* Page */
   set page(
     paper: "a4",
@@ -221,6 +274,7 @@
 
   /* Footnote entries (we add some spacing after the counter and a grid to align
      multiline footnotes). */
+  set footnote.entry(indent: 1em, gap: 0.8em)
   show footnote.entry: it => {
     grid(
       columns: (it.indent, auto, 0.3em, 1fr),
@@ -235,17 +289,11 @@
     )
   }
 
-  set footnote.entry(indent: 1em, gap: 0.8em)
-
   /* Sections */
-  set heading(numbering: "1.1  ")
   show heading: set block(above: 2.4em, below: 1.4em)
 
-  /* Equations */
-  set math.equation(numbering: "(1)")
-
   /* Links (we don't color references) */
-  show link: set text(fill: palette-overrides.primary)
+  show link: set text(fill: palette.primary)
 
   /* Tables and figures */
   show table.cell.where(y: 0): strong
@@ -315,19 +363,12 @@
     it
   }
 
-  /* Hook to pass raw content through the function library. */
-  show raw: it => { _raw-links.format-raw(it) }
-  show raw.line: it => { _raw-links.format-raw-line(it) }
-
-  /* Hook to pass references through the requirements library. */
-  show ref: it => { _requirements.format-reference(it) }
-
   /* Conditionally insert the title page. */
   if show-title-page {
-    _title-page(metadata, logotype, palette-overrides)
+    _title-page(metadata, logotype, palette)
     counter(page).update(1)
   } else {
-    _title-line(metadata, palette-overrides)
+    _title-line(metadata, palette)
   }
 
   /* Conditionally insert the outline and a pagebreak. */
@@ -335,17 +376,6 @@
     _outline()
     pagebreak()
   }
-
-  /* Update the global palette and generate a matching one for admonition boxes. */
-  set raw(theme: "raw.tmTheme")
-  update-palette(..palette-overrides)
-  generate-admonition-palette(palette-overrides.primary, palette-overrides.secondary)
-
-  /* Update the global document metadata for arbitrary access to the values
-     provided to the template. We spread the dictionary be because each named
-     argument gets inserted into the metadata (we don't interact with the state
-     variable directly). */
-  update-metadata(..metadata)
 
   /* FIXME: Probably need referenceable enumeration items with https://gist.github.com/PgBiel/23a116de4a235ad4cf6c7a05d6648ca9 */
 
@@ -359,6 +389,86 @@
   backmatter
 }
 
+#let document(
+  title: none,
+  subtitle: none,
+  document-name: none,
+  author: none,
+  classification: "Public",
+  revision: sys.inputs.at("revision", default: none),
+  document-id: none,
+  date: sys.inputs.at("date", default: datetime.today().display()),
+  url: none,
+  logotype: none,
+  backmatter: none,
+  html-footer: none,
+  show-title-page: true,
+  show-outline: true,
+  show-footer: true,
+  font: "Liberation Sans",
+  monofont: "Latin Modern Mono",
+  mathfont: none,
+  fontsize: 10pt,
+  palette-overrides: none,
+  body,
+) = {
+  /* Merge the default palette with any user overrides. */
+  palette-overrides = DEFAULT-PALETTE + palette-overrides
+
+  /* Construct the document name. */
+  if document-name == none and title != none {
+    document-name = title
+    if subtitle != none {
+      document-name += [ --- #subtitle]
+    }
+  }
+
+  /* Pack a metadata dictionary for to pass to typesetting functions. */
+  let metadata = (
+    title: title,
+    subtitle: subtitle,
+    document-name: document-name,
+    author: author,
+    classification: classification,
+    revision: revision,
+    document-id: document-id,
+    date: date,
+    url: url,
+  )
+
+  /* Sections */
+  set heading(numbering: "1.1  ")
+
+  /* Equations */
+  set math.equation(numbering: "(1)")
+
+  /* Hook to pass raw content through the function library. */
+  show raw: it => { _raw-links.format-raw(it) }
+  show raw.line: it => { _raw-links.format-raw-line(it) }
+
+  /* Hook to pass references through the requirements library. */
+  show ref: it => { _requirements.format-reference(it) }
+
+  /* Update the global palette and generate a matching one for admonition boxes. */
+  set raw(theme: "raw.tmTheme")
+  update-palette(..palette-overrides)
+  generate-admonition-palette(palette-overrides.primary, palette-overrides.secondary)
+
+  /* Update the global document metadata for arbitrary access to the values
+     provided to the template. We spread the dictionary be because each named
+     argument gets inserted into the metadata (we don't interact with the state
+     variable directly). */
+  update-metadata(..metadata)
+
+  context if target() == "html" {
+    _document-html(metadata, logotype, html-footer, font, monofont, mathfont,
+                   palette-overrides, body)
+  } else {
+    _document-pdf(metadata, logotype, backmatter, show-title-page, show-outline, show-footer,
+                  font, monofont, mathfont, fontsize, palette-overrides, body)
+  }
+}
+
 /* Insert unnumbered pages w/o header and footer at the end of the document. */
 #let backmatter(logotype: none, footer: none, body) = {
   context _page-before-backmatter.update(counter(page).get().at(0))
@@ -368,15 +478,17 @@
 
 /* FIXME: Call it "document history" instead? */
 #let changelog(..any) = context {
-  pagebreak(weak: true)
-  heading(level: 1, numbering: none, outlined: false, bookmarked: false)[Changelog]
-  table(
-    columns: (0.2fr, 0.8fr),
-    fill: none,
-    table.header[Location][Description],
-    ..any.pos().flatten(),
-  )
-  pagebreak()
+  if target() != "html" {
+    pagebreak(weak: true)
+    heading(level: 1, numbering: none, outlined: false, bookmarked: false)[Changelog]
+    table(
+      columns: (0.2fr, 0.8fr),
+      fill: none,
+      table.header[Location][Description],
+      ..any.pos().flatten(),
+    )
+    pagebreak()
+  }
 }
 
 #let changelog-section(hide: false, label, date, ..any) = (

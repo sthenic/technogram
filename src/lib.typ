@@ -11,3 +11,14 @@
 #import "requirements.typ": requirements, req, reqcomment
 
 #let fixme(body) = block(text(fill: red, [*FIXME:* ] + body))
+
+#let center-block(..args) = {
+  context if target() == "html" {
+    html.div(class: "tg-centered")[#args.pos().join()]
+  } else {
+    block(..args.named())[
+      #set align(center)
+      #args.pos().join()
+    ]
+  }
+}

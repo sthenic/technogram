@@ -1,0 +1,539 @@
+:root {
+  --doc-max: 100ch;
+  --font: sans-serif;
+  --monofont: monospace;
+  --link-color: #005050;
+}
+
+html, body {
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  padding-inline: 1rem;
+  padding-block: 2rem;
+  font-size: 1rem;
+  font-family: var(--font);
+}
+
+a:link {
+  color: var(--link-color);
+  text-decoration: none;
+}
+
+a:visited {
+  color: var(--link-color);
+  text-decoration: none;
+}
+
+img, svg, video {
+  max-width: 100%;
+  height: auto;
+}
+
+pre {
+  overflow-x: auto;
+  margin-block: 0;
+}
+
+code, pre, kbd, samp {
+  font-family: var(--monofont);
+  font-size: 1rem;
+  font-weight: normal;
+}
+
+p {
+  text-align: justify;
+  margin: 0;
+}
+
+p + p {
+  text-indent: 15pt;
+}
+
+math {
+  margin: 0.5em 0;
+  font-family: var(--mathfont);
+}
+
+ol { list-style-type: decimal; }
+ol ol { list-style-type: lower-alpha; }
+ol ol ol { list-style-type: lower-roman; }
+ol ol ol ol { list-style-type: upper-alpha; }
+ol ol ol ol ol { list-style-type: decimal; }
+
+.container {
+  display: grid;
+  grid-template-columns: 0.6fr 350px var(--doc-max) 1fr;
+  gap: 2rem;
+  width: 100%;
+  padding-top: 1rem;
+}
+
+.sidebar {
+  grid-column: 2;
+  position: sticky;
+  top: 2rem;
+  max-height: 90vh;
+  overflow-y: auto;
+  mask-image: linear-gradient(to bottom, black calc(100% - 3em), transparent);
+  -webkit-mask-image: linear-gradient(to bottom, black calc(100% - 3em), transparent);
+}
+
+.sidebar::-webkit-scrollbar {
+  width: 4px;
+}
+
+.sidebar::-webkit-scrollbar-thumb {
+  background: #888;
+  border-radius: 2px;
+}
+
+.sidebar::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.sidebar-logo {
+  margin-top: 0;
+  margin-bottom: 10%;
+  margin-right: 10%;
+}
+
+.sidebar-logo img {
+  width: 100%;
+  height: auto !important;
+  display: block;
+}
+
+.sidebar a:link,
+.sidebar a:visited {
+  color: inherit;
+  display: flex;
+  gap: 0.4em;
+  margin-bottom: 0.4em;
+}
+
+.sidebar a > span:first-child {
+  flex-shrink: 0;
+}
+
+.sidebar a > span:last-child {
+  flex: 1;
+  min-width: 0;
+}
+
+.sidebar a.active {
+  font-weight: bold;
+}
+
+.sidebar ol {
+  padding-left: 0;
+  margin: 0;
+}
+
+.sidebar ol ol {
+  padding-left: 1.5em;
+}
+
+.sidebar ol ol ol {
+  padding-left: 2.5em;
+}
+
+.sidebar li {
+  margin-top: 0.5em;
+}
+
+.sidebar nav {
+  margin-right: 5%;
+  padding-bottom: 3em;
+}
+
+.content {
+  grid-column: 3;
+  min-width: 0;
+  line-height: 1.6;
+  padding-bottom: 80vh;
+}
+
+.content-title {
+  margin: -0.15em 0 0.2em;
+  padding-bottom: 0.2em;
+  font-size: 2em;
+  line-height: 1;
+  border-bottom: 1px solid
+}
+
+.content-subtitle {
+  margin: 0 0 1em;
+  font-size: 1.2em;
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+}
+
+.content-meta {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 0 1em;
+  margin-bottom: 2em;
+  font-size: 0.9em;
+  color: #666;
+}
+
+.content-footer {
+  margin-top: 4em;
+  padding-top: 1em;
+  border-top: 1px solid #ccc;
+  font-size: 0.85em;
+  color: #666;
+}
+
+.content li {
+  margin-top: 0.8em;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  caption-side: top;
+}
+
+figcaption {
+  text-align: left;
+  margin-top: 2em;
+}
+
+figure {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-block: 2rem;
+}
+
+/* Anchor captions for tables to the top. */
+figure:has(table) {
+  flex-direction: column-reverse;
+}
+
+figure:has(table) figcaption {
+  margin-top: 0;
+  margin-bottom: 1em;
+}
+
+thead tr {
+  font-weight: bold;
+  border-bottom: 2px solid currentColor;
+  border-top: 2px solid currentColor;
+}
+
+tbody tr:nth-child(odd) {
+  background-color: #ffffff;
+}
+
+tbody tr:nth-child(even) {
+  background-color: #f0f0f0;
+}
+
+tbody tr:last-child {
+  border-bottom: 2px solid currentColor;
+}
+
+td, th {
+  padding: 0.4em 0.6em;
+  text-align: left;
+}
+
+.tg-fa-icon {
+  font-family: "Font Awesome 6 Free Solid";
+  font-weight: 900;
+  margin-right: 0.4em;
+}
+
+.tg-fa-stack {
+  position: relative;
+  display: inline-block;
+  width: 1em;
+  margin-right: 0.4em;
+}
+
+.tg-fa-stack .tg-fa-icon {
+  margin-right: 0;
+}
+
+.tg-fa-stack .tg-fa-overlay {
+  position: absolute;
+  left: 0;
+  top: 0;
+}
+
+.tg-admonition {
+  display: flex;
+  margin: 1em 0;
+}
+
+.tg-admonition-gutter {
+  flex: 0 0 auto;
+}
+
+.tg-admonition-content {
+  flex: 1;
+  min-width: 0;
+}
+
+.tg-admonition-header {
+  padding: 0.25em 0.5em;
+  font-weight: 700;
+}
+
+.tg-admonition-body {
+  padding: 0.5em;
+  text-align: justify;
+}
+
+.tg-cpp-object {
+  margin: 2em 0;
+}
+
+.tg-cpp-object > section > :first-child {
+  margin-bottom: 0.3em;
+}
+
+.tg-cpp-object > section > :nth-child(2) {
+  margin-top: 0;
+}
+
+.tg-cpp-header {
+  padding-top: 0.6em;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 1em;
+  margin-bottom: 1.2em;
+}
+
+.tg-cpp-signature {
+  flex: 1;
+  min-width: 0;
+}
+
+.tg-cpp-note {
+  flex-shrink: 0;
+  font-style: italic;
+  opacity: 0.8;
+}
+
+.tg-describe {
+  margin: 1em 0;
+}
+
+.tg-describe-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 1em;
+}
+
+.tg-describe-label {
+  font-weight: bold;
+}
+
+.tg-describe-note {
+  font-style: italic;
+  opacity: 0.8;
+}
+
+.tg-describe-body {
+  margin-top: 0.3em;
+  text-align: justify;
+}
+
+.tg-describe-body > :first-child {
+  margin-top: 0;
+}
+
+.tg-grouped-outline ul {
+  list-style: none;
+  margin-top: 0;
+}
+
+.tg-grouped-outline li {
+  margin: 0.3em 0;
+}
+
+.tg-grouped-outline-title {
+  margin-top: 1em;
+  margin-bottom: 0.3em;
+}
+
+.tg-reg-object {
+  margin: 2em 0;
+}
+
+.tg-reg-header {
+  padding-top: 0.6em;
+}
+
+.tg-reg-meta {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 0.3em 2em;
+  margin-bottom: 1em;
+}
+
+.tg-reg-meta > div {
+  display: contents;
+}
+
+.tg-reg-bitfield {
+  width: 100%;
+  border-collapse: collapse;
+  table-layout: fixed;
+  text-align: center;
+  margin: 1em 0;
+}
+
+.tg-reg-bit-num-top,
+.tg-reg-bit-num-bottom {
+  background: #f0f0f0;
+  border: 1px solid #f0f0f0;
+  padding: 0.2em;
+  font-weight: normal;
+  text-align: center;
+}
+
+.tg-reg-bit-num-top {
+  border-bottom: none;
+}
+
+.tg-reg-bit-num-bottom {
+  border-top: none;
+}
+
+.tg-reg-field {
+  border: 1px solid #999;
+  padding: 0.4em 0.2em;
+  text-align: center;
+  background: #fff;
+  overflow-wrap: anywhere;
+  hyphens: auto;
+}
+
+.tg-reg-reserved {
+  border: 1px solid #999;
+  padding: 0.4em 0.2em;
+  text-align: center;
+  background: #fff;
+}
+
+.tg-tree {
+  margin: 1em 0;
+}
+
+.tg-tree ul {
+  list-style: none;
+  padding-left: 0;
+  margin: 0;
+}
+
+.tg-tree li {
+  position: relative;
+  padding-left: 1.5em;
+  padding-top: 0.3em;
+  margin: 0;
+  text-align: justify;
+}
+
+.tg-tree li::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0;
+  height: 100%;
+  width: 0;
+  border-left: 1px solid currentColor;
+}
+
+.tg-tree li:last-child::before {
+  height: 1.1em;
+}
+
+.tg-tree li::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 1.1em;
+  width: 1em;
+  height: 0;
+  border-bottom: 1px solid currentColor;
+}
+
+.tg-tree-span {
+  display: grid;
+  gap: 1em;
+}
+
+.tg-centered {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin: 0.5em 0;
+}
+
+/* Mobile toggle button (hidden on desktop) */
+.sidebar-toggle {
+  display: none;
+  position: fixed;
+  top: 1rem;
+  left: 1rem;
+  z-index: 1000;
+  background: #fff;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  width: 2rem;
+  height: 2rem;
+  padding: 0;
+  cursor: pointer;
+  background-image:
+    linear-gradient(currentColor, currentColor),
+    linear-gradient(currentColor, currentColor),
+    linear-gradient(currentColor, currentColor);
+  background-size: 50% 2px;
+  background-position: center 30%, center 50%, center 70%;
+  background-repeat: no-repeat;
+}
+
+@media (max-width: 1300px) {
+  .container {
+    display: block;
+    width: auto;
+    padding: 0 5%;
+  }
+
+  .sidebar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 280px;
+    height: 100vh;
+    max-height: 100vh;
+    background: #fff;
+    border-right: 1px solid #ccc;
+    padding: 1rem;
+    transform: translateX(-100%);
+    transition: transform 0.2s ease;
+    z-index: 999;
+  }
+
+  .sidebar.open {
+    transform: translateX(0);
+  }
+
+  .sidebar-toggle {
+    display: block;
+  }
+
+  .content {
+    margin-top: 3rem;
+  }
+}

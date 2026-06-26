@@ -35,40 +35,109 @@
   ])
 }
 
-/* Define an object (function, struct, enumeration or define). */
-#let _object(
-  name: none,
-  type: none,
-  returns: none,
-  note: none,
-  short-description: none,
-  see-also: none,
-  value: none,
-  group: none,
-  show-descriptions: true,
-  breakable: false,
-  ..subobjects,
-  description,
-) = context {
-  let is-struct = type == "struct"
-  let is-enum = type == "enum"
-  let is-define = type == "define"
+#let _object-html(
+  name,
+  type,
+  returns,
+  note,
+  short-description,
+  see-also,
+  show-descriptions,
+  is-struct,
+  is-enum,
+  is-define,
+  opening-symbol,
+  closing-symbol,
+  subobjects,
+  description
+) = {
+  let primary = get-palette().primary.to-hex()
 
-  /* Not having these as positional arguments leads to more readable
-     invocations. Ideally, the LSP could be leveraged for that but lookup of
-     custom functions seems a bit shaky? */
-
-  if name == none { panic("A 'name' must be specified.") }
-  if type == none { panic("A 'type' must be specified.") }
-
-  let seen = ()
-  for subobject in subobjects.pos() {
-    if subobject.name in seen {
-      panic(name + "::" + subobject.name + " is already defined.")
+  /* Build signature lines. */
+  let opening-text = if is-define { "#" } else { "" } + type + " " + name + opening-symbol
+  let sig-lines = (opening-text,)
+  for (i, x) in subobjects.pos().enumerate() {
+    let prefix = if show-descriptions { name + "::" } else { "" }
+    let line = "    "
+    if is-struct {
+      line += x.type + " " + prefix + x.name + x.dimension + ";"
+    } else if is-enum {
+      line += x.name + " = " + x.type + if i < subobjects.pos().len() - 1 { "," }
+    } else {
+      line += x.type + " " + prefix + x.name + x.dimension + if i < subobjects.pos().len() - 1 { "," }
     }
-    seen.push(subobject.name)
+    sig-lines.push(line)
   }
 
+  if closing-symbol != none {
+    sig-lines.push(closing-symbol)
+  }
+
+  html.div(class: "tg-cpp-object")[
+    #html.div(class: "tg-cpp-header", style: "border-top: 3px solid " + primary + ";")[
+      #html.div(class: "tg-cpp-signature")[
+        #raw(sig-lines.join("\n"), lang: "cpp")
+        #label(name)
+      ]
+      #if note != none { html.div(class: "tg-cpp-note")[#note] }
+    ]
+
+    #if short-description != none {
+      html.p(class: "tg-cpp-short-desc")[#emph[#short-description]]
+    }
+
+    #if returns != none {
+      html.section(class: "tg-cpp-returns")[
+        #heading(level: 3, numbering: none, outlined: false)[Return value]
+        #returns
+      ]
+    }
+
+    #if see-also != none {
+      html.section(class: "tg-cpp-see-also")[
+        #heading(level: 3, numbering: none, outlined: false)[See also]
+        #see-also.join(", ")
+      ]
+    }
+
+    #if description != [] {
+      html.section(class: "tg-cpp-description")[
+        #heading(level: 3, numbering: none, outlined: false)[Description]
+        #description
+      ]
+    }
+
+    #if show-descriptions and subobjects.pos().len() > 0 {
+      html.section(class: "tg-cpp-subobjects")[
+        #heading(level: 3, numbering: none, outlined: false)[
+          #if is-struct [Members] else if is-enum [Values] else [Parameters]
+        ]
+
+        #subobjects.pos().map(x => {
+          _subobject_description(x, label-prefix: if is-enum { "" } else { name + "::" })
+        }).join()
+      ]
+    }
+  ]
+}
+
+#let _object-pdf(
+  name,
+  type,
+  returns,
+  note,
+  short-description,
+  see-also,
+  show-descriptions,
+  breakable,
+  is-struct,
+  is-enum,
+  is-define,
+  opening-symbol,
+  closing-symbol,
+  subobjects,
+  description
+) = {
   /* We change the typesetting of subobjects depending on the object type. */
   let rows = subobjects.pos().enumerate().map(((i, x)) => {
     let prefix = if show-descriptions { name + "::" } else { none }
@@ -80,29 +149,6 @@
       _parameter(x, prefix: prefix, last: i == subobjects.pos().len() - 1)
     }
   }).join()
-
-  /* Determine the opening and closing symbols depending on the object type and
-     whether or not we have collected any subobjects. */
-  let (opening-symbol, closing-symbol) = {
-    if is-struct or is-enum {
-      if subobjects.pos().len() > 0 {
-        (" {", `}`)
-      } else {
-        (" {}", none)
-      }
-    } else if is-define {
-      (" " + value, none)
-    } else {
-      if subobjects.pos().len() > 0 {
-        ("(", `)`)
-      } else {
-        ("()", none)
-      }
-    }
-  }
-
-  /* Add entry so we can retrieve the object for the outline. */
-  _grouped-outline.grouped-outline-entry(raw(name), group, "cpp")
 
   let opening-text = if is-define { "#" } else { "" } + type + " " + name + opening-symbol
   block(breakable: breakable)[
@@ -121,7 +167,7 @@
       /* Spread the rows into the grid. */
       ..rows,
       /* The closing row. */
-      closing-symbol
+      if closing-symbol != none { raw(closing-symbol) }
     )
   ]
 
@@ -154,7 +200,75 @@
       #if is-struct [Members] else if is-enum [Values] else [Parameters]
     ]
 
-    subobjects.pos().map(x => { _subobject_description(x, label-prefix: if is-enum { "" } else { name + "::" }) }).join()
+    subobjects.pos().map(x => {
+      _subobject_description(x, label-prefix: if is-enum { "" } else { name + "::" })
+    }).join()
+  }
+}
+
+/* Define an object (function, struct, enumeration or define). */
+#let _object(
+  name: none,
+  type: none,
+  returns: none,
+  note: none,
+  short-description: none,
+  see-also: none,
+  value: none,
+  group: none,
+  show-descriptions: true,
+  breakable: false,
+  ..subobjects,
+  description,
+) = context {
+  let is-struct = type == "struct"
+  let is-enum = type == "enum"
+  let is-define = type == "define"
+
+  if name == none { panic("A 'name' must be specified.") }
+  if type == none { panic("A 'type' must be specified.") }
+
+  let seen = ()
+  for subobject in subobjects.pos() {
+    if subobject.name in seen {
+      panic(name + "::" + subobject.name + " is already defined.")
+    }
+    seen.push(subobject.name)
+  }
+
+  /* Determine the opening and closing symbols depending on the object type and
+     whether or not we have collected any subobjects. */
+  let (opening-symbol, closing-symbol) = {
+    if is-struct or is-enum {
+      if subobjects.pos().len() > 0 {
+        (" {", "}")
+      } else {
+        (" {}", none)
+      }
+    } else if is-define {
+      (" " + value, none)
+    } else {
+      if subobjects.pos().len() > 0 {
+        ("(", ")")
+      } else {
+        ("()", none)
+      }
+    }
+  }
+
+  /* Add entry so we can retrieve the object for the outline. */
+  _grouped-outline.grouped-outline-entry(raw(name), group, "cpp")
+
+  if target() == "html" {
+    _object-html(
+      name, type, returns, note, short-description, see-also, show-descriptions, is-struct,
+      is-enum, is-define, opening-symbol, closing-symbol, subobjects, description
+    )
+  } else {
+    _object-pdf(
+      name, type, returns, note, short-description, see-also, show-descriptions, breakable,
+      is-struct, is-enum, is-define, opening-symbol, closing-symbol, subobjects, description
+    )
   }
 }
 
