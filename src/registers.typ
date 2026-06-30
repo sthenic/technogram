@@ -158,7 +158,7 @@
   block(breakable: false)[
     #grid(
       columns: (100% / 8,) * 8,
-      align: center + bottom,
+      align: center + horizon,
       inset: 0.5em,
       ..top-row,
       .._field-cells(fields.pos(), name, show-descriptions, size-bytes),
