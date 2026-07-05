@@ -221,25 +221,25 @@ figure:has(table) figcaption {
   margin-bottom: 1em;
 }
 
-thead tr {
+figure thead tr {
   font-weight: bold;
   border-bottom: 2px solid currentColor;
   border-top: 2px solid currentColor;
 }
 
-tbody tr:nth-child(odd) {
+figure tbody tr:nth-child(odd) {
   background-color: #ffffff;
 }
 
-tbody tr:nth-child(even) {
+figure tbody tr:nth-child(even) {
   background-color: #f0f0f0;
 }
 
-tbody tr:last-child {
+figure tbody tr:last-child {
   border-bottom: 2px solid currentColor;
 }
 
-td, th {
+figure td, figure th {
   padding: 0.4em 0.6em;
   text-align: left;
 }
