@@ -16,7 +16,7 @@
   context if target() == "html" {
     html.div(class: "tg-centered")[#args.pos().join()]
   } else {
-    block(..args.named())[
+    block(width: 100%, ..args.named())[
       #set align(center)
       #args.pos().join()
     ]
