@@ -289,6 +289,9 @@
     )
   }
 
+  /* Equations */
+  show math.equation: set block(above: 2em, below: 2em)
+
   /* Sections */
   show heading: set block(above: 2.4em, below: 1.4em)
 
