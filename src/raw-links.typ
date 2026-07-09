@@ -74,7 +74,7 @@
     }
 
     let c = text.at(pos)
-    if c.match(regex("[a-zA-z]")) != none {
+    if c.match(regex("[a-zA-Z]")) != none {
       /* Eject any ongoing segment without inserting markers, we're about to
          start an identifier. */
       if segment.len() > 0 {
