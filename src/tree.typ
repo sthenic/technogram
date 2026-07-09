@@ -134,7 +134,7 @@
 
   /* We wrap everything in a block to allow the user to choose whether the tree
      is breakable or not.  */
-  block(breakable: breakable, {
+  block(breakable: breakable, above: 1.5em, below: 1.5em, {
     set block(spacing: 0pt)
     block[#content-on-this-level]
 
