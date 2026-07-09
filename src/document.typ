@@ -332,7 +332,7 @@
     indent: 1.5em,
     body-indent: 1em,
     spacing: 1.5em,
-    number-align: start + top,
+    number-align: start,
     full: true,
     numbering: (..n) => {
       let remainder = calc.rem(n.pos().len(), 4)
