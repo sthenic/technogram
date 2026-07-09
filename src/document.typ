@@ -445,6 +445,10 @@
   /* Hook to pass raw content through the function library. */
   show raw: it => { _raw-links.format-raw(it) }
   show raw.line: it => { _raw-links.format-raw-line(it) }
+  show math.equation: it => {
+    show raw: r => { _raw-links.format-raw-in-math(r) }
+    it
+  }
 
   /* Hook to pass references through the requirements library. */
   show ref: it => { _requirements.format-reference(it) }

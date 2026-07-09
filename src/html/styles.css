@@ -37,7 +37,7 @@ pre {
   margin-block: 0;
 }
 
-code, pre, kbd, samp {
+code, pre, kbd, samp, .tg-mtext-mono {
   font-family: var(--monofont);
   font-size: 1rem;
   font-weight: normal;

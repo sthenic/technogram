@@ -225,3 +225,30 @@
     )<technogram-modified-raw-line>]
   }
 }
+
+#let format-raw-in-math(it, ignore-prefix: false) = {
+  /* For math, we hijack the raw environment altogether to be able to render
+     linkable identifiers in HTML <math> environments (where <code> is not
+     allowed). The trade-off is that we cannot typeset blocks of code with
+     syntax highlighting inside equations but that's an extremely unlikely use
+     case anyway. */
+  context if target() == "html" {
+    let mtext(body) = html.elem("mtext", attrs: (class: "tg-mtext-mono"), body)
+    let text-with-markers = _lex-and-insert-markers(it.text, ignore-prefix)
+    let content-with-links = _markers-to-links(text-with-markers, text-with-markers)
+    if type(content-with-links) == str {
+      /* TODO: This adds an <mtext> within the <mi> - is that a problem? */
+      mtext(content-with-links)
+    } else {
+      for c in content-with-links.children {
+        if c.func() == link {
+          link(c.dest, mtext(c.body))
+        } else {
+          c
+        }
+      }
+    }
+  } else {
+    it
+  }
+}
