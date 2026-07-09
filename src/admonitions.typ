@@ -33,37 +33,28 @@
 /* TODO: Avoid inheriting indentation w/ https://stackoverflow.com/a/78185552 */
 #let _admonition-pdf(header-color, body-color, header, symbol, gutter, breakable, body) = {
   let inset = 0.5em
-  let cells = (
-    if header != none {
-      grid.cell(fill: header-color, colspan: 2, inset: inset)[
-        /* We resort to a hacky solution to keep the header with the contents
-           while still allowing the admonition box to be breakable. See comment
-           in "descriptions.typ". */
-        #block(breakable: false)[
-          #set text(fill: get-text-color(header-color))
-          #grid(
-            columns: (if symbol != none { 1.5em } else { 0pt }, 1fr),
-            align: bottom + left,
-            if symbol != none { text(font: "Font Awesome 6 Free Solid", symbol) },
-            strong(header)
-          )
-          #v(3em)
-        ]
-        #v(-3em)
-      ]
-    },
-    grid.cell(fill: header-color)[],
-    grid.cell(fill: body-color, inset: inset)[
-      #set text(fill: get-text-color(body-color))
-      #body
-    ],
-  ).filter(x => x != none)
-
   block(breakable: breakable, spacing: 1.5em)[
-    #grid(
-      columns: (gutter, 100% - gutter),
-      ..cells
-    )
+    #if header != none {
+      block(sticky: true, below: 0pt, width: 100%, fill: header-color, inset: inset)[
+        #set text(fill: get-text-color(header-color))
+        #grid(
+          columns: (if symbol != none { 1.5em } else { 0pt }, 1fr),
+          align: bottom + left,
+          if symbol != none { text(font: "Font Awesome 6 Free Solid", symbol) },
+          strong(header)
+        )
+      ]
+    }
+    #block(above: 0pt)[
+      #grid(
+        columns: (gutter, 1fr),
+        grid.cell(fill: header-color)[],
+        grid.cell(fill: body-color, inset: inset)[
+          #set text(fill: get-text-color(body-color))
+          #body
+        ],
+      )
+    ]
   ]
   /* TODO: Wishlist: add some vertical space if a list is the last thing in the box. */
 }
