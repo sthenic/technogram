@@ -5,7 +5,8 @@
 /* Typeset the description of a subobject using the describe environment. */
 #let _subobject_description(subobject, label-prefix: "") = {
   describe([
-      #raw(subobject.name + subobject.dimension + " (" + subobject.type + ")", lang: "cpp")
+      #box(raw(subobject.name + subobject.dimension, lang: "cpp"))
+      #box(raw(" (" + subobject.type + ")", lang: "cpp"))
       #label(label-prefix + subobject.name)
     ],
     note: subobject.note
@@ -151,8 +152,9 @@
   }).join()
 
   let opening-text = if is-define { "#" } else { "" } + type + " " + name + opening-symbol
-  block(breakable: breakable)[
+  block(breakable: breakable, sticky: true)[
     #set block(spacing: 8pt)
+    #set par(justify: false)
     #line(length: 100%, stroke: 1pt + get-palette().primary)
     #grid(
       columns: (20pt, 1fr, auto),
@@ -171,9 +173,12 @@
     )
   ]
 
+  /* Reduce the vertical space between headings for the next part. */
+  show heading: set block(above: 1.4em, below: 1.4em)
+
   /* Insert the short description if any. */
   if short-description != none {
-    block[#emph[#short-description]]
+    block(above: 1.4em)[#emph[#short-description]]
   }
 
   /* Return value content with a heading that's not included in the outline. */
