@@ -16,11 +16,31 @@
         .replace("IbXRuT", "::")
         .replace("zRVeVY", "")
 
+      /* Insert zero-width break opportunities at reasonable locations (Pascal
+         and snake case separators) without emitting any character into the PDF
+         text stream, keeping the text searchable. */
+      let insert-discretionary-breaks(t) = {
+        let sep = "\u{FFFF}"
+        let marked = t
+          .replace(regex("[a-z][A-Z]"), x => { x.text.at(0) + sep + x.text.at(1) })
+          .replace("_", "_" + sep)
+
+        context if target() != "html" {
+          marked.split(sep).map(s => box(s)).join(h(0pt))
+        } else {
+          marked.split(sep).join(html.wbr())
+        }
+      }
+
       let split = link-text.split("::")
       if split.len() > 1 {
-        content += link(label(link-text), text(hyphenate: true, split.at(1)))
+        content += link(
+          label(link-text), text(hyphenate: true, insert-discretionary-breaks(split.at(1)))
+        )
       } else {
-        content += link(label(link-text), text(hyphenate: true, link-text))
+        content += link(
+          label(link-text), text(hyphenate: true, insert-discretionary-breaks(link-text))
+        )
       }
 
       index = match.end
