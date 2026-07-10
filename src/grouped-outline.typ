@@ -57,12 +57,12 @@
   }
 
   for group in outline-groups {
+    v(2em, weak: true)
     if outline-groups.len() > 0 {
       /* Don't place a heading for the default group or if disabled altogether. */
       if show-title and group != default-group {
         /* Attempt to locate the page of any label with the same name as the group.
            We have to gate behind a `query` because `locate` must be successful. */
-        v(1.2em, weak: true)
         let (label, page) = if query(label(group)).len() > 0 {
           let location = locate(label(group))
           (link(location)[#text(weight: "bold", fill: text.fill)[#group]], strong[#location.page()])
@@ -81,10 +81,10 @@
       }
     }
 
-    outline(
+    block(inset: if show-title { (left: 1em) } else { (:) }, outline(
       title: none,
       target: figure.where(kind: group)
-    )
+    ))
   }
 }
 
