@@ -70,7 +70,7 @@
     let split = identifier.split("_")
     if split.len() > 1 {
       let id = split.slice(1).join("_")
-      if query(label(id)).len() > 0 {
+      if id.len() > 0 and query(label(id)).len() > 0 {
         return split.at(0) + "_jdztDE" + id.replace("::", "IbXRuT") + "zRVeVY"
       }
     }

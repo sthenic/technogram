@@ -408,6 +408,7 @@
   show-title-page: true,
   show-outline: true,
   show-footer: true,
+  raw-ignore-prefix: false,
   font: "Liberation Sans",
   monofont: "Latin Modern Mono",
   mathfont: none,
@@ -446,10 +447,10 @@
   set math.equation(numbering: "(1)")
 
   /* Hook to pass raw content through the function library. */
-  show raw: it => { _raw-links.format-raw(it) }
+  show raw: it => { _raw-links.format-raw(it, ignore-prefix: raw-ignore-prefix) }
   show raw.line: it => { _raw-links.format-raw-line(it) }
   show math.equation: it => {
-    show raw: r => { _raw-links.format-raw-in-math(r) }
+    show raw: r => { _raw-links.format-raw-in-math(r, ignore-prefix: raw-ignore-prefix) }
     it
   }
 
