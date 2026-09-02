@@ -167,6 +167,7 @@
   show-footer: true,
   font: "Liberation Sans",
   monofont: "Latin Modern Mono",
+  mathfont: none,
   fontsize: 10pt,
   palette-overrides: none,
   body,
@@ -213,6 +214,10 @@
   set text(font: font, size: fontsize)
   show raw: set text(font: monofont, size: fontsize)
   set super(typographic: false, baseline: -0.6em)
+  show math.equation: it => {
+    set text(font: if mathfont == none { text.font } else { mathfont })
+    it
+  }
 
   /* Footnote entries (we add some spacing after the counter and a grid to align
      multiline footnotes). */

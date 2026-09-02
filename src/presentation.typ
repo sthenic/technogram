@@ -121,6 +121,7 @@
   logotype: none,
   font: "Arial",
   monofont: "Latin Modern Mono",
+  mathfont: none,
   fontsize: 20pt,
   palette-overrides: none,
   show-outline: false,
@@ -157,6 +158,11 @@
   /* Fonts */
   set text(font: font, size: fontsize)
   show raw: set text(font: monofont, size: fontsize)
+  set super(typographic: false, baseline: -0.6em)
+  show math.equation: it => {
+    set text(font: if mathfont == none { text.font } else { mathfont })
+    it
+  }
 
   /* Equations */
   set math.equation(numbering: "(1)")
