@@ -22,3 +22,24 @@
     ]
   }
 }
+
+#let flipped-page(flip-captions: false, body) = {
+  context if target() == "html" {
+    body
+  } else {
+    set page(flipped: true)
+    /* Hook into the figure command to control the rendering on a flipped page. */
+    show figure: it => {
+      if flip-captions {
+        grid(
+          columns: (auto, 1fr),
+          rotate(90deg, reflow: true)[#it.caption],
+          it.body
+        )
+      } else {
+        it
+      }
+    }
+    body
+  }
+}
