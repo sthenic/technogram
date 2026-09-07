@@ -9,6 +9,7 @@
 #import "palette.typ": DEFAULT-PALETTE, update-palette, get-palette
 #import "metadata.typ": get-metadata, get-metadata-value
 #import "requirements.typ": requirements, req, reqcomment
+#import "subfigure.typ": subfigure
 
 #let fixme(body) = block(text(fill: red, [*FIXME:* ] + body))
 

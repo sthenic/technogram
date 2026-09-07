@@ -2,6 +2,13 @@
 #import "metadata.typ": get-metadata, update-metadata
 #import "raw-links.typ" as _raw-links
 #import "requirements.typ" as _requirements
+#import "subfigure.typ" as _subfigure
+
+/* Lookup table for custom reference formatters. */
+#let _reference-formatters = (:
+  .._requirements.reference-formatters,
+  .._subfigure.reference-formatters,
+)
 
 /* A state that holds the page number where the `backmatter` starts at.
    We use this to exclude backmatter pages from the total page count. */
@@ -464,8 +471,26 @@
     it
   }
 
-  /* Hook to pass references through the requirements library. */
-  show ref: it => { _requirements.format-reference(it) }
+  /* Show rule to hook into the reference framework for custom typesetting of
+     references. This mechanism is based on a dict where custom formatters are
+     registered to trigger on a specific "kind" of element. */
+  show ref: it => {
+    let kind = if it.element != none and it.element.has("kind") {
+      it.element.kind
+    } else {
+      none
+    }
+
+    let formatter = if type(kind) == str {
+      _reference-formatters.at(kind, default: none)
+    }
+
+    if formatter != none {
+      formatter(it)
+    } else {
+      it
+    }
+  }
 
   /* Update the global palette and generate a matching one for admonition boxes. */
   set raw(theme: "raw.tmTheme")

@@ -1,13 +1,9 @@
 #import "to-string.typ": *
 
-/* Hook to replace references of kind 'requirement' with custom text. */
-#let format-reference(it) = {
-  if it.element != none and it.element.has("kind") and it.element.kind == "requirement" {
-    link(it.target, it.element.caption.body)
-  } else {
-    it
-  }
-}
+/* Custom formatter keyed by the referenced figure kind. */
+#let reference-formatters = (
+  requirement: it => link(it.target, it.element.caption.body),
+)
 
 /* Add a set of requirements with the same prefix, e.g. '3.4'. */
 #let requirements(
