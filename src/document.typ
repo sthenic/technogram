@@ -167,6 +167,16 @@
   show v: it => { none }
   show pagebreak: it => { none }
 
+  /* Workaround to restore right-adjusted labels for block equations. */
+  show math.equation.where(block: true): it => {
+    html.div(class: "tg-equation-block")[
+      #html.div(class: "tg-equation")[#it]
+      #html.span(class: "tg-equation-label")[
+        #counter(math.equation).display()
+      ]
+    ]
+  }
+
   /* Customize outline entires so that we can control alignment. */
   show outline.entry: it => {
     link(it.element.location())[
