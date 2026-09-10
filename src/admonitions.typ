@@ -112,10 +112,10 @@
 )
 
 /* An example */
-#let example(..args) = context admonition(
+#let example(label: none, ..args) = context admonition(
   get-palette().example-header,
   get-palette().example-body,
-  header: "Example",
+  header: "Example" + if label != none [︱#label],
   symbol: "\u{f02d}",
   ..args
 )
