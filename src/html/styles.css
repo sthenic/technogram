@@ -213,6 +213,11 @@ ol ol ol ol ol { list-style-type: decimal; }
   margin-top: 0.8em;
 }
 
+.content ul {
+  margin-top: 0.8em;
+  margin-bottom: 0.8em;
+}
+
 table {
   width: 100%;
   border-collapse: collapse;
