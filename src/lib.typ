@@ -44,3 +44,38 @@
     body
   }
 }
+
+#let rotated-cell(angle: -35deg, inset: 4pt, min-width: none, body) = table.cell(
+  align: left + bottom
+)[
+  #let rotated-content = rotate(angle, reflow: true, body)
+  #context if target() == "html" {
+    /* Size-hinting for columns. */
+    let min-width = if min-width == none {
+      0pt
+    } else if type(min-width) == content {
+      measure(min-width).width
+    } else {
+      min-width
+    }
+
+    html.span(
+      class: "tg-rotated-cell",
+      style: (
+        "--tg-rotated-cell-angle: " + repr(angle) + ";" +
+        "--tg-rotated-cell-inset: " + repr(inset) + ";" +
+        "--tg-rotated-cell-height: " + repr(2.0 * measure(rotated-content).height) + ";" +
+        "--tg-rotated-cell-min-width: " + repr(min-width) + ";" +
+        "--tg-rotated-cell-shift: " + repr(0.7em) + ";"
+      )
+    )[
+      #html.span(class: "tg-rotated-cell-label")[#body]
+    ]
+  } else {
+    box(
+      rotated-content,
+      width: measure(rotated-content).width,
+      inset: (bottom: inset)
+    )
+  }
+]

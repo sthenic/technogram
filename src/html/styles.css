@@ -275,12 +275,9 @@ figure thead tr {
   border-top: 2px solid currentColor;
 }
 
-.tg-table-no-top-rule thead tr {
-  border-top: none;
-}
-
-.tg-table-no-top-rule {
-  width: 100%;
+/* If there's a rotated cell in the header, align everything at the bottom. */
+figure thead tr:has(.tg-rotated-cell) > th {
+  vertical-align: bottom;
 }
 
 figure tbody tr:nth-child(odd) {
@@ -298,6 +295,32 @@ figure tbody tr:last-child {
 figure td, figure th {
   padding: 0.4em 0.6em;
   text-align: left;
+}
+
+.tg-table-no-top-rule thead tr {
+  border-top: none;
+}
+
+.tg-table-no-top-rule {
+  width: 100%;
+}
+
+.tg-rotated-cell {
+  display: flex;
+  height: var(--tg-rotated-cell-height);
+  min-inline-size: var(--tg-rotated-cell-min-width, 0);
+  align-items: flex-end;
+  padding-bottom: var(--tg-rotated-cell-inset);
+  contain: inline-size;
+}
+
+.tg-rotated-cell-label {
+  display: inline-block;
+  flex: none;
+  inline-size: max-content;
+  transform: translateX(var(--tg-rotated-cell-shift, 0)) rotate(var(--tg-rotated-cell-angle));
+  transform-origin: bottom left;
+  white-space: nowrap;
 }
 
 .tg-fa-icon {
