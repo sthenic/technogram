@@ -1,4 +1,4 @@
-#import "palette.typ": DEFAULT-PALETTE, update-palette, generate-admonition-palette, table-fill, table-stroke
+#import "palette.typ": DEFAULT-PALETTE, update-palette, generate-admonition-palette, table-fill, table-stroke, table-stroke-no-top-rule
 #import "metadata.typ": get-metadata, update-metadata
 #import "raw-links.typ" as _raw-links
 #import "requirements.typ" as _requirements
@@ -190,6 +190,10 @@
       #html.span[#it.prefix()]
       #html.span[#it.body()]
     ]
+  }
+
+  show table.where(stroke: table-stroke-no-top-rule): it => {
+    html.div(class: "tg-table-no-top-rule")[#it]
   }
 
   /* Some CSS values propagate from the framework. */

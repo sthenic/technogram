@@ -65,5 +65,12 @@
   left: 0pt,
   right: 0pt,
   top: if y == 0 { 1.2pt } else if y == 1 { 0.7pt } else { 0pt },
-  bottom: 1.2pt,
+  bottom: if y == 0 { 0.7pt } else { 1.2pt },
+)
+
+#let table-stroke-no-top-rule = (x, y) => (
+  left: 0pt,
+  right: 0pt,
+  top: if y == 1 { 0.7pt } else { 0pt },
+  bottom: if y == 0 { 0.7pt } else { 1.2pt },
 )

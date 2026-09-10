@@ -275,6 +275,14 @@ figure thead tr {
   border-top: 2px solid currentColor;
 }
 
+.tg-table-no-top-rule thead tr {
+  border-top: none;
+}
+
+.tg-table-no-top-rule {
+  width: 100%;
+}
+
 figure tbody tr:nth-child(odd) {
   background-color: #ffffff;
 }
