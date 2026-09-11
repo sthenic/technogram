@@ -564,7 +564,8 @@ figure td, figure th {
   display: flex;
   flex-direction: column;
   align-items: center;
-  margin: 0.5em 0;
+  padding-top: var(--tg-centered-above, 0);
+  padding-bottom: var(--tg-centered-below, 0);
 }
 
 /* Mobile toggle button (hidden on desktop) */

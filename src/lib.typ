@@ -15,7 +15,14 @@
 
 #let center-block(..args) = {
   context if target() == "html" {
-    html.div(class: "tg-centered")[#args.pos().join()]
+    html.div(
+      class: "tg-centered",
+      style: (
+        /* We manually support the named parameters that determine vertical padding. */
+        "--tg-centered-above: " + repr(args.named().at("above", default: 0pt)) + ";" +
+        "--tg-centered-below: " + repr(args.named().at("below", default: 0pt)) + ";"
+      ),
+    )[#args.pos().join()]
   } else {
     block(width: 100%, ..args.named())[
       #set align(center)
