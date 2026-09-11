@@ -6,7 +6,7 @@
 #import "registers.typ" as reg
 #import "presentation.typ": presentation
 #import "document.typ": document, changelog, changelog-section, backmatter, appendix
-#import "palette.typ": DEFAULT-PALETTE, update-palette, get-palette, table-stroke-no-top-rule
+#import "palette.typ": DEFAULT-PALETTE, update-palette, get-palette, table-fill-no-header, table-stroke-no-header, table-stroke-no-top-rule
 #import "metadata.typ": get-metadata, get-metadata-value
 #import "requirements.typ": requirements, req, reqcomment
 #import "subfigure.typ": subfigure
@@ -91,3 +91,37 @@
     )
   }
 ]
+
+#let striped-grid(..args) = {
+  /* Extract the named parameters with special meaning. */
+  let named = args.named()
+  let inset = named.remove("inset", default: 0.65em)
+  let spacing = named.remove("spacing", default: 1em)
+
+  context if target() == "html" {
+    /* We use a table instead of a grid for HTML because it's a better match for
+       applying the row-alternating color scheme. */
+    html.div(
+      class: "tg-striped-grid",
+      style: (
+        "--tg-striped-grid-inset: " + repr(inset) + ";" +
+        "--tg-striped-grid-margin: " + repr(spacing) + " 0;"
+      )
+    )[
+      #table(
+        ..named,
+        ..args.pos(),
+      )
+    ]
+  } else {
+    block(
+      spacing: spacing,
+      grid(
+        fill: table-fill-no-header,
+        inset: inset,
+        ..named,
+        ..args.pos(),
+      )
+    )
+  }
+}

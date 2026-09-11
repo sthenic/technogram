@@ -347,6 +347,24 @@ figure td, figure th {
   white-space: nowrap;
 }
 
+.tg-striped-grid {
+  width: 100%;
+  margin: var(--tg-striped-grid-margin, 2em);
+}
+
+.tg-striped-grid tbody tr:nth-child(odd) {
+  background-color: #fff;
+}
+
+.tg-striped-grid tbody tr:nth-child(even) {
+  background-color: #f0f0f0;
+}
+
+.tg-striped-grid td {
+  padding: var(--tg-striped-grid-inset, 0.65em);
+  text-align: left;
+}
+
 .tg-fa-icon {
   font-family: "Font Awesome 6 Free Solid";
   font-weight: 900;
