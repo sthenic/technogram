@@ -305,6 +305,14 @@ figure td, figure th {
   width: 100%;
 }
 
+.tg-wide-table {
+  width: 100%;
+}
+
+.tg-wide-table table {
+  min-width: 140ch;
+}
+
 .tg-rotated-cell {
   display: flex;
   height: var(--tg-rotated-cell-height);

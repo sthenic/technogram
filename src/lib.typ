@@ -26,6 +26,11 @@
 
 #let flipped-page(flip-captions: false, body) = {
   context if target() == "html" {
+    /* Tables typeset on a flipped page gets a special container div to allow
+       special handling in the CSS. */
+    show table: it => {
+      html.div(class: "tg-wide-table")[#it]
+    }
     body
   } else {
     set page(flipped: true)
