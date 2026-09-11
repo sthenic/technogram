@@ -236,6 +236,22 @@ figure {
   margin-block: 2rem;
 }
 
+.tg-grid {
+  display: grid;
+  grid-template-columns: var(--tg-grid-columns);
+  column-gap: var(--tg-grid-column-gutter);
+  row-gap: var(--tg-grid-row-gutter);
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.tg-grid-cell {
+  grid-column: span var(--tg-grid-column-span, 1);
+  grid-row: span var(--tg-grid-row-span, 1);
+  min-width: 0;
+  box-sizing: border-box;
+}
+
 .tg-subfigure-grid {
   display: grid;
   grid-template-columns: var(--tg-subfigure-columns);

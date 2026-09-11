@@ -157,6 +157,57 @@
   outline()
 }
 
+#let _grid-columns-to-css(columns) = {
+  if type(columns) == int {
+    "repeat(" + str(columns) + ", auto)"
+  } else if type(columns) == array {
+    if columns.len() == 0 {
+      "auto"
+    } else {
+      columns.map(repr).join(" ")
+    }
+  } else {
+    repr(columns)
+  }
+}
+
+#let _grid-gutter-to-css(gutter) = {
+  /* We only support same-sized gutters in the grid. */
+  if type(gutter) == array and gutter.len() > 0 {
+    "calc(" + repr(gutter.first()) + ")"
+  } else {
+    repr(gutter)
+  }
+}
+
+/* Render the simple, row-major subset of a grid. */
+#let _grid-html(it) = {
+  let style = (
+    "--tg-grid-columns: " + _grid-columns-to-css(it.columns) + ";" +
+    "--tg-grid-column-gutter: " + _grid-gutter-to-css(it.column-gutter) + ";" +
+    "--tg-grid-row-gutter: " + _grid-gutter-to-css(it.row-gutter) + ";"
+  )
+
+  html.div(class: "tg-grid", style: style)[
+    #for child in it.children {
+      if child.func() == grid.cell {
+        /* If a grid cell is manually constructed we support the rowspan and
+           colspan configuration. */
+        html.div(
+          class: "tg-grid-cell",
+          style: (
+            "--tg-grid-column-span: " + str(child.at("colspan", default: 1)) + ";" +
+            "--tg-grid-row-span: " + str(child.at("rowspan", default: 1)) + ";"
+          ),
+        )[#child.body]
+      } else {
+        /* Implicit cells, i.e. [A], [B] etc. */
+        html.div(class: "tg-grid-cell")[#child]
+      }
+    }
+  ]
+}
+
 #let _document-html(
   metadata,
   logotype,
@@ -173,6 +224,10 @@
   /* FIXME: Unsupported functions that generate warnings if used. */
   show v: it => { none }
   show pagebreak: it => { none }
+
+  /* Dispatch general grid layouts to a handler that support simple cases.
+     TODO: This may not be needed once Typst offers built-in support. */
+  show grid: _grid-html
 
   /* Workaround to restore right-adjusted labels for block equations. */
   show math.equation.where(block: true): it => {
