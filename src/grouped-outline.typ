@@ -26,7 +26,10 @@
 }
 
 #let _grouped-outline-html(outline-groups, show-title, default-group) = {
-  html.nav(class: "tg-grouped-outline")[
+  html.nav(
+    class: "tg-grouped-outline",
+    style: "--tg-grouped-outline-inset: " + if show-title { "1em" } else { "0" },
+  )[
     #for group in outline-groups {
       let items = query(figure.where(kind: group))
       if items.len() > 0 {

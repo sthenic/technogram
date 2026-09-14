@@ -475,7 +475,7 @@ figure td, figure th {
 
 .tg-grouped-outline ul {
   list-style: none;
-  margin-top: 0;
+  padding-inline-start: var(--tg-grouped-outline-inset, 0);
 }
 
 .tg-grouped-outline li {
