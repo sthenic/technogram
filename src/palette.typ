@@ -24,6 +24,9 @@
 
   display-header: rgb("#005050"),
   display-body: luma(240),
+
+  code-header: luma(220),
+  code-body: luma(240),
 )
 
 /* The global palette state. */

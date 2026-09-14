@@ -32,14 +32,14 @@
 
 /* TODO: Avoid inheriting indentation w/ https://stackoverflow.com/a/78185552 */
 #let _admonition-pdf(header-color, body-color, header, symbol, gutter, breakable, body) = {
-  let inset = 0.5em
   block(breakable: breakable, spacing: 1.5em)[
     #if header != none {
-      block(sticky: true, below: 0pt, width: 100%, fill: header-color, inset: inset)[
+      let width = calc.max(measure(h(1.5em)).width, 1.2 * measure(symbol).width)
+      block(sticky: true, below: 0pt, width: 100%, fill: header-color, inset: 0.5em)[
         #set text(fill: get-text-color(header-color))
         #grid(
-          columns: (if symbol != none { 1.5em } else { 0pt }, 1fr),
-          align: bottom + left,
+          columns: (if symbol != none { width } else { 0pt }, 1fr),
+          align: horizon + left,
           if symbol != none { text(font: "Font Awesome 6 Free Solid", symbol) },
           strong(header)
         )
@@ -49,7 +49,7 @@
       #grid(
         columns: (gutter, 1fr),
         grid.cell(fill: header-color)[],
-        grid.cell(fill: body-color, inset: inset)[
+        grid.cell(fill: body-color, inset: 0.65em)[
           #set text(fill: get-text-color(body-color))
           #body
         ],
@@ -137,3 +137,27 @@
   gutter: 2pt,
   ..args
 )
+
+/* A code example box */
+#let code-example(label: none, start: 0, stop: none, lang: "c", show-header: true, body) = {
+  /* This object is slightly more sophisticated. Assuming body is a string
+     resulting from a read operation (we cannot read the file here due to
+     relative paths not being evaluated w.r.t. the caller) we simplify
+     extracting a contiguous range of lines defined by (start, stop). */
+  let content = if type(body) == str {
+    raw(block: true, lang: lang, body.split("\n").slice(start, stop).join("\n"))
+  } else {
+    body
+  }
+
+  show raw: set par(leading: 0.6em)
+  context admonition(
+    get-palette().code-header,
+    get-palette().code-body,
+    header: if show-header { "Code" + if label != none [︱#label] } else { none },
+    /* The symbol has a slight vertical offset which we compensate for here. */
+    symbol: if target() == "html" { "\u{f121}" } else { move(dy: -0.5pt, [\u{f121}#h(1em)]) },
+    gutter: 2pt,
+    content
+  )
+}
