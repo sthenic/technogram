@@ -304,6 +304,22 @@ figure tbody tr:nth-child(even) {
   background-color: #f0f0f0;
 }
 
+figure tbody tr:has(.tg-table-section-heading) {
+  background-color: #ffffff;
+  border-top: 1px solid currentColor;
+  border-bottom: 1px solid currentColor;
+  page-break-after: avoid;
+  break-after: avoid-page;
+}
+
+figure tbody tr:has(.tg-table-section-row-light) {
+  background-color: #ffffff;
+}
+
+figure tbody tr:has(.tg-table-section-row-shaded) {
+  background-color: #f0f0f0;
+}
+
 figure tbody tr:last-child {
   border-bottom: 2px solid currentColor;
 }

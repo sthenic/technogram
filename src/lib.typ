@@ -10,6 +10,7 @@
 #import "metadata.typ": get-metadata, get-metadata-value
 #import "requirements.typ": requirements, req, reqcomment
 #import "subfigure.typ": subfigure
+#import "table.typ": table-section
 
 #let fixme(body) = block(text(fill: red, [*FIXME:* ] + body))
 
