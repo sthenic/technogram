@@ -233,9 +233,9 @@
   show math.equation.where(block: true): it => {
     html.div(class: "tg-equation-block")[
       #html.div(class: "tg-equation")[#it]
-      #html.span(class: "tg-equation-label")[
-        #counter(math.equation).display()
-      ]
+      #if it.numbering != none {
+        html.span(class: "tg-equation-label")[#counter(math.equation).display()]
+      }
     ]
   }
 
