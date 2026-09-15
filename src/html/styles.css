@@ -407,6 +407,8 @@ figure td, figure th {
 .tg-admonition {
   display: flex;
   margin: 1em 0;
+  border-radius: 0.25em;
+  overflow: hidden;
 }
 
 .tg-admonition-gutter {

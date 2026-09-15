@@ -35,7 +35,14 @@
   block(breakable: breakable, spacing: 1.5em)[
     #if header != none {
       let width = calc.max(measure(h(1.5em)).width, 1.2 * measure(symbol).width)
-      block(sticky: true, below: 0pt, width: 100%, fill: header-color, inset: 0.5em)[
+      block(
+        sticky: true,
+        below: 0pt,
+        width: 100%,
+        fill: header-color,
+        inset: 0.5em,
+        radius: (top-left: 0.25em, top-right: 0.25em)
+      )[
         #set text(fill: get-text-color(header-color))
         #grid(
           columns: (if symbol != none { width } else { 0pt }, 1fr),
