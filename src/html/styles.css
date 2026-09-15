@@ -459,7 +459,6 @@ figure td, figure th {
 .tg-cpp-note {
   flex-shrink: 0;
   font-style: italic;
-  opacity: 0.8;
 }
 
 .tg-describe {
@@ -479,7 +478,10 @@ figure td, figure th {
 
 .tg-describe-note {
   font-style: italic;
-  opacity: 0.8;
+}
+
+.tg-describe-note code {
+  font-style: normal;
 }
 
 .tg-describe-body {
