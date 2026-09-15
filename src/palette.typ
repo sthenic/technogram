@@ -22,7 +22,7 @@
   release-header: rgb("#005050"),
   release-body: rgb("#D2E6E6"),
 
-  display-header: rgb("#005050"),
+  display-header: luma(220),
   display-body: luma(240),
 
   code-header: luma(220),
@@ -54,7 +54,6 @@
     example-body: secondary,
     release-header: primary,
     release-body: secondary,
-    display-header: primary,
   )
 }
 
